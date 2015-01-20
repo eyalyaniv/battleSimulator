@@ -16,16 +16,18 @@
     					 'archers':  {"infantryAtt": 0.5, "infantryDef": 0.5, "archersAtt": 1.0, "archersDef": 1.0, "cavalryAtt": 2.0, "cavalryDef": 2.0},
     					 'cavalry':  {"infantryAtt": 2.0, "infantryDef": 2.0, "archersAtt": 0.5, "archersDef": 0.5, "cavalryAtt": 1.0, "cavalryDef": 1.0}};
 
-	this.attArmy = {'infantry' : {'t1' : 1000, 't2' : 0, 't3' : 0},
-				   	'archers' : {'t1' : 0, 't2' : 0, 't3' : 0},
+	this.attArmy = {'infantry' : {'t1' : 0, 't2' : 0, 't3' : 9000},
+				   	'archers' : {'t1' : 0, 't2' : 0, 't3' : 6000},
 				   	'cavalry' : {'t1' : 0, 't2' : 0, 't3' : 0}};
 
-	this.defArmy = {'infantry' : {'t1' : 60, 't2' : 300, 't3' : 0},
+	this.defArmy = {'infantry' : {'t1' : 60, 't2' : 300, 't3' : 3000},
 				   	'archers' : {'t1' : 0, 't2' : 0, 't3' : 0},
 				   	'cavalry' : {'t1' : 0, 't2' : 0, 't3' : 0}};
 		
 	this.armyStatePerRound = [[attArmy, defArmy]];
 	this.battleLog = {};
+	this.endOfBattleAttArmyState = JSON.parse(JSON.stringify(attArmy));
+	this.endOfBattleDefArmyState = JSON.parse(JSON.stringify(defArmy));
 	setUpRound();
 
 })();
@@ -58,13 +60,13 @@ function setUpRound(){
 
 		if(calcArmySum(defArmyCalc) === 0){
 			console.log(' >>>>>>>>>>>>>>>>>>>>> BATTLE IS OVER <<<<<<<<<<<<<<<<<<<<<');
-			console.log('Battle is over - Defender lost the battle');
+			//console.log('Battle is over - Defender lost the battle');
 			produceBattleReport();
 			return;
 		}
 		if(calcArmySum(attArmyCalc) === 0){
 			console.log(' >>>>>>>>>>>>>>>>>>>>> BATTLE IS OVER <<<<<<<<<<<<<<<<<<<<<');
-			console.log('Battle is over - Attacker lost the battle');
+			//console.log('Battle is over - Attacker lost the battle');
 			produceBattleReport();
 			return;
 		}
@@ -128,6 +130,9 @@ function executeRound(attTroopForThisRound, defTroopForThisRound, attArmyCalc, d
 
 	armyStatePerRound[roundCount] = [attArmyCopy, defArmyCopy];
 	battleLog[roundCount-1] = {'attTroop': attTroopForThisRound, 'attTroopLosses' : attLoses, 'defTroop': defTroopForThisRound, 'defTroopLosses': defLoses};
+	endOfBattleAttArmyState[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attLoses;
+	endOfBattleDefArmyState[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defLoses;
+
 	console.log('Round result:');
 	console.log('Defender troop lost: ' + defLoses);	
 	console.log('Attacker troop lost: ' + attLoses);	 
@@ -292,6 +297,31 @@ function calcAttackerLosses(attTroopForThisRound,defTroopForThisRound, minAtt){
 };
 
 function produceBattleReport(){
+	var i=0;
+	var totalAttArmyLoses = {};
+	var totalDefArmyLoses = {};
+	var attArmyRes=JSON.parse(JSON.stringify(armyStatePerRound[0][0]));
+	var defArmyRes=JSON.parse(JSON.stringify(armyStatePerRound[0][1]));
+
 	console.log(JSON.stringify(armyStatePerRound));
 	console.log(JSON.stringify(battleLog));
+
+	for(i=0; i<battleLog.length; i++){
+
+		//totalAttArmyLoses
+
+		/*
+
+		this.troopsTypes = ['infantry', 'archers', 'cavalry'];
+		this.tiers = ['t1', 't2', 't3'];
+
+		attArmyRes[troopsTypes[i]][tiers[i]] -= battleLog[i]
+
+		battleLog[i] = {'attTroop': attTroopForThisRound, 'attTroopLosses' : attLoses, 'defTroop': defTroopForThisRound, 'defTroopLosses': defLoses};
+		*/
+	}
+};
+
+function declareWinner(){
+
 };
