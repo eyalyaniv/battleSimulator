@@ -297,31 +297,28 @@ function calcAttackerLosses(attTroopForThisRound,defTroopForThisRound, minAtt){
 };
 
 function produceBattleReport(){
-	var i=0;
-	var totalAttArmyLoses = {};
-	var totalDefArmyLoses = {};
-	var attArmyRes=JSON.parse(JSON.stringify(armyStatePerRound[0][0]));
-	var defArmyRes=JSON.parse(JSON.stringify(armyStatePerRound[0][1]));
-
-	console.log(JSON.stringify(armyStatePerRound));
-	console.log(JSON.stringify(battleLog));
-
-	for(i=0; i<battleLog.length; i++){
-
-		//totalAttArmyLoses
-
-		/*
-
-		this.troopsTypes = ['infantry', 'archers', 'cavalry'];
-		this.tiers = ['t1', 't2', 't3'];
-
-		attArmyRes[troopsTypes[i]][tiers[i]] -= battleLog[i]
-
-		battleLog[i] = {'attTroop': attTroopForThisRound, 'attTroopLosses' : attLoses, 'defTroop': defTroopForThisRound, 'defTroopLosses': defLoses};
-		*/
-	}
+	console.log('Attacker army end of battle state : ');
+	console.log(JSON.stringify(endOfBattleAttArmyState));
+	console.log('Attacker army end of battle state : ');
+	console.log(JSON.stringify(endOfBattleDefArmyState));
 };
 
 function declareWinner(){
+
+	//Victory is determined as follows:
+	// 1. If an army lost all his troops 
+	// 2. If both armies loast some troops the one that lost more (in quantity not by type or tier) loses the battle.
+
+	if(calcArmySum(endOfBattleAttArmyState) === 0){
+		console.log('Attacker Lost');
+	}
+	if(calcArmySum(endOfBattleDefArmyState) === 0){
+		console.log('Defender Lost');
+	}
+	if((calcArmySum(endOfBattleDefArmyState) === 0) && (calcArmySum(endOfBattleAttArmyState) === 0)){
+		console.log('Both Armys are gone!');
+	}
+
+
 
 };
