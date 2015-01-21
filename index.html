@@ -4,6 +4,75 @@
     <script type="text/javascript" src="sim.js"></script>
   </head>
   <body bgcolor=white>
-    <div id="div1">Sky Wars Battle simulator</div>
+  	<div id="div1">Sky Wars Battle simulator</div>
+
+    <form id="globalvars">
+  		Number Of Rounds: <input type="text" name="numOfRounds" value="8"/>
+  		Fatality percent: <input type="text" name="fatalityPercent" value="13"/>
+  		Accuracy: <input type="text" name="accuracy" value="1"/><br>
+  		Troops Types: <input type="text" name="troop1" value="infantry"/><input type="text" name="troop2" value="archers"/><input type="text" name="troop3" value="cavalry"/><input type="text" name="troop4" value=""/><input type="text" name="troop5" value=""/><br>
+  		Tiers Types: <input type="text" name="t1" value="t1"/><input type="text" name="t2" value="t2"/><input type="text" name="t3" value="t3"/><input type="text" name="t4" value=""/><input type="text" name="t5" value=""/><br><br><br>
+	</form>
+	<form id="armies">
+    	<div>Attacker Army:</div>
+      <br>
+      Infantry T1: <input type="text" name="attInfantryT1" value="0"/>                    Infantry T1: <input type="text" name="defInfantryT1" value="0"/><br>
+      Archers T1: <input type="text" name="attArchersT1" value="0"/>                      Archers T1: <input type="text" name="defArchersT1" value="0"/><br>
+      Cavalry T1: <input type="text" name="attCavalryT1" value="0"/>                      Cavalry T1: <input type="text" name="defCavalryT1" value="0"/><br><br>
+      <br>
+      <br>
+      Infantry T2: <input type="text" name="attInfantryT2" value="0"/><br>
+      Archers T2: <input type="text" name="attArchersT2" value="0"/><br>
+      Cavalry T2: <input type="text" name="attCavalryT2" value="0"/><br>
+      <br>
+      <br>
+      Infantry T3: <input type="text" name="attInfantryT3" value="0"/><br>
+      Archers T3: <input type="text" name="attArchersT3" value="0"/><br>
+      Cavalry T3: <input type="text" name="attCavalryT3" value="0"/><br>
+      <br>
+      <br>
+      Infantry T4: <input type="text" name="attInfantryT4" value="0"/><br>
+      Archers T4: <input type="text" name="attArchersT4" value="0"/><br>
+      Cavalry T4: <input type="text" name="attCavalryT4" value="0"/><br>
+      <br>
+      <br>
+      Infantry T5: <input type="text" name="attInfantryT5" value="0"/><br>
+      Archers T5: <input type="text" name="attArchersT5" value="0"/><br>
+      Cavalry T5: <input type="text" name="attCavalryT5" value="0"/><br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <div>Defender Army:</div>
+      <br>
+      Infantry T1: <input type="text" name="defInfantryT1" value="0"/><br>
+      Archers T1: <input type="text" name="defArchersT1" value="0"/><br>
+      
+      <br>
+      <br>
+      Infantry T2: <input type="text" name="defInfantryT2" value="0"/><br>
+      Archers T2: <input type="text" name="defArchersT2" value="0"/><br>
+      Cavalry T2: <input type="text" name="defCavalryT2" value="0"/><br>
+      <br>
+      <br>
+      Infantry T3: <input type="text" name="defInfantryT3" value="0"/><br>
+      Archers T3: <input type="text" name="defArchersT3" value="0"/><br>
+      Cavalry T3: <input type="text" name="defCavalryT3" value="0"/><br>
+      <br>
+      <br>
+      Infantry T4: <input type="text" name="defInfantryT4" value="0"/><br>
+      Archers T4: <input type="text" name="defArchersT4" value="0"/><br>
+      Cavalry T4: <input type="text" name="defCavalryT4" value="0"/><br>
+      <br>
+      <br>
+      Infantry T5: <input type="text" name="defInfantryT5" value="0"/><br>
+      Archers T5: <input type="text" name="defArchersT5" value="0"/><br>
+      Cavalry T5: <input type="text" name="defCavalryT5" value="0"/><br>
+
+	</form>
+
+	<div id="log"></div>
+
+	
   </body>
 </html>
