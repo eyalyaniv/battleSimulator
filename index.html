@@ -6,73 +6,179 @@
   <body bgcolor=white>
   	<div id="div1">Sky Wars Battle simulator</div>
 
+    
+
     <form id="globalvars">
+      <text>Defender boosts: </text>
+      Attack Boost: <input type="text" name="defBoostAtt" value="1"/> Defence Boost: <input type="text" name="defBoostDef" value="1"/><br>
+      <text>Attacker boosts: </text>
+      Attack Boost: <input type="text" name="attBoostAtt" value="1"/> Defence Boost: <input type="text" name="attBoostDef" value="1"/><br>
   		Number Of Rounds: <input type="text" name="numOfRounds" value="8"/>
   		Fatality percent: <input type="text" name="fatalityPercent" value="13"/>
   		Accuracy: <input type="text" name="accuracy" value="1"/><br>
-  		Troops Types: <input type="text" name="troop1" value="infantry"/><input type="text" name="troop2" value="archers"/><input type="text" name="troop3" value="cavalry"/><input type="text" name="troop4" value=""/><input type="text" name="troop5" value=""/><br>
-  		Tiers Types: <input type="text" name="t1" value="t1"/><input type="text" name="t2" value="t2"/><input type="text" name="t3" value="t3"/><input type="text" name="t4" value=""/><input type="text" name="t5" value=""/><br><br><br>
+  		Troops Types: <input type="text" name="troop1" value="infantry"/><input type="text" name="troop2" value="archers"/><input type="text" name="troop3" value="cavalry"/><input type="text" name="troop4" value="mage"/><input type="text" name="troop5" value="seals"/>
+      <br>
+      <text>Troops RPS</text>
+      <br>
+      Infantry:  <br>infantryAtt: <input type="text" name="inf_infantryAtt" value="1"/> <br> 
+                infantryDef: <input type="text" name="inf_infantryDef" value="1"/> <br>
+                archersAtt: <input type="text" name="inf_archersAtt" value="2"/> <br>
+                archersDef: <input type="text" name="inf_archersDef" value="2"/> <br>
+                cavalryAtt: <input type="text" name="inf_cavalryAtt" value="0.5"/> <br>
+                cavalryDef: <input type="text" name="inf_cavalryDef" value="0.5"/> <br>
+                mageAtt: <input type="text" name="inf_mageAtt" value="0.67"/> <br>
+                mageDef: <input type="text" name="inf_mageDef" value="0.67"/> <br>
+                sealsAtt: <input type="text" name="inf_sealsAtt" value="2"/> <br>
+                sealsDef: <input type="text" name="inf_sealsDef" value="2"/> <br>
+      <br>
+      Archers:   <br>infantryAtt: <input type="text" name="arch_infantryAtt" value="0.5"/> <br> 
+                infantryAtt: <input type="text" name="arch_infantryAtt" value="0.5"/> <br>
+                archersAtt: <input type="text" name="arch_archersAtt" value="1"/> <br>
+                archersDef: <input type="text" name="arch_archersDef" value="1"/> <br>
+                cavalryAtt: <input type="text" name="arch_cavalryAtt" value="2"/> <br>
+                cavalryDef: <input type="text" name="arch_cavalryDef" value="2"/> <br>
+                mageAtt: <input type="text" name="arch_mageAtt" value="0.67"/> <br>
+                mageDef: <input type="text" name="arch_mageDef" value="0.67"/> <br>
+                sealsAtt: <input type="text" name="arch_sealsAtt" value="2"/> <br>
+                sealsDef: <input type="text" name="arch_sealsDef" value="2"/> <br>
+      <br>
+      Cavalry:   <br>infantryAtt: <input type="text" name="cav_infantryAtt" value="2"/>  <br>
+                infantryAtt: <input type="text" name="cav_infantryAtt" value="2"/> <br>
+                archersAtt: <input type="text" name="cav_archersAtt" value="0.5"/> <br>
+                archersDef: <input type="text" name="cav_archersDef" value="0.5"/> <br>
+                cavalryAtt: <input type="text" name="cav_cavalryAtt" value="1"/> <br>
+                cavalryDef: <input type="text" name="cav_cavalryDef" value="1"/> <br>
+                mageAtt: <input type="text" name="cav_mageAtt" value="0.67"/> <br>
+                mageDef: <input type="text" name="cav_mageDef" value="0.67"/> <br>
+                sealsAtt: <input type="text" name="cav_sealsAtt" value="2"/> <br>
+                sealsDef: <input type="text" name="cav_sealsDef" value="2"/> <br>
+      <br>
+      Mage:      <br>infantryAtt: <input type="text" name="mage_infantryAtt" value="1.5"/>  <br>
+                infantryAtt: <input type="text" name="mage_infantryAtt" value="1.5"/> <br>
+                archersAtt: <input type="text" name="mage_archersAtt" value="1.5"/> <br>
+                archersDef: <input type="text" name="mage_archersDef" value="1.5"/> <br>
+                cavalryAtt: <input type="text" name="mage_cavalryAtt" value="1.5"/> <br>
+                cavalryDef: <input type="text" name="mage_cavalryDef" value="1.5"/> <br>
+                mageAtt: <input type="text" name="mage_mageAtt" value="1"/> <br>
+                mageDef: <input type="text" name="mage_mageDef" value="1"/> <br>
+                sealsAtt: <input type="text" name="mage_sealsAtt" value="2"/> <br>
+                sealsDef: <input type="text" name="mage_sealsDef" value="2"/> <br>
+      <br>
+      Seals:     <br>infantryAtt: <input type="text" name="seals_infantryAtt" value="2"/> <br> 
+                infantryAtt: <input type="text" name="seals_infantryAtt" value="2"/> <br>
+                archersAtt: <input type="text" name="seals_archersAtt" value="2"/> <br>
+                archersDef: <input type="text" name="seals_archersDef" value="2"/> <br>
+                cavalryAtt: <input type="text" name="seals_cavalryAtt" value="2"/> <br>
+                cavalryDef: <input type="text" name="seals_cavalryDef" value="2"/> <br>
+                mageAtt: <input type="text" name="seals_mageAtt" value="0.5"/> <br>
+                mageDef: <input type="text" name="seals_mageDef" value="0..5"/> <br>
+                sealsAtt: <input type="text" name="seals_sealsAtt" value="1"/> <br>
+                sealsDef: <input type="text" name="seals_sealsDef" value="1"/> <br>
+      <br>
+      <text>Might Coefficient</text>
+      <br>
+      Infantry: T1: <input type="text" name="mightCoInfantryT1" value="2.25"/> 
+                T2: <input type="text" name="mightCoInfantryT2" value="4.5"/>
+                T3: <input type="text" name="mightCoInfantryT3" value="8.5"/>
+                T4: <input type="text" name="mightCoInfantryT4" value="17"/>
+                T5: <input type="text" name="mightCoInfantryT5" value="0"/>
+      <br>
+      Archers:  T1: <input type="text" name="mightCoArchersT1" value="2.25"/> 
+                T2: <input type="text" name="mightCoArchersT2" value="4.5"/>
+                T3: <input type="text" name="mightCoArchersT3" value="8.5"/>
+                T4: <input type="text" name="mightCoArchersT4" value="17"/>
+                T5: <input type="text" name="mightCoArchersT5" value="0"/>
+      <br>
+      Cavalry:  T1: <input type="text" name="mightCoCavalryT1" value="2.25"/> 
+                T2: <input type="text" name="mightCoCavalryT2" value="4.5"/>
+                T3: <input type="text" name="mightCoCavalryT3" value="8.5"/>
+                T4: <input type="text" name="mightCoCavalryT4" value="17"/>
+                T5: <input type="text" name="mightCoCavalryT5" value="0"/>
+      <br>
+      Mage:     T1: <input type="text" name="mightCoMageT1" value="2.25"/> 
+                T2: <input type="text" name="mightCoMageT2" value="4.5"/>
+                T3: <input type="text" name="mightCoMageT3" value="8.5"/>
+                T4: <input type="text" name="mightCoMageT4" value="17"/>
+                T5: <input type="text" name="mightCoMageT5" value="0"/>
+      <br>
+      Seals:    T1: <input type="text" name="mightCoSealsT1" value="3"/> 
+                T2: <input type="text" name="mightCoSealsT2" value="6"/>
+                T3: <input type="text" name="mightCoSealsT3" value="12"/>
+                T4: <input type="text" name="mightCoSealsT4" value="24"/>
+                T5: <input type="text" name="mightCoSealsT5" value="36"/>
+      <br>
+      <text>Armies: </text>
+      <br><br>
+      <text>Attacker's Army: </text> 
+      <br>
+      Infantry: T1: <input type="text" name="attInfantryT1" value="0"/> 
+                T2: <input type="text" name="attInfantryT2" value="0"/>
+                T3: <input type="text" name="attInfantryT3" value="0"/>
+                T4: <input type="text" name="attInfantryT4" value="0"/>
+                T5: <input type="text" name="attInfantryT5" value="0"/>
+      <br>
+      Archers:  T1: <input type="text" name="attArchersT1" value="0"/> 
+                T2: <input type="text" name="attArchersT2" value="0"/>
+                T3: <input type="text" name="attArchersT3" value="0"/>
+                T4: <input type="text" name="attArchersT4" value="0"/>
+                T5: <input type="text" name="attArchersT5" value="0"/>
+      <br>
+      Cavalry:  T1: <input type="text" name="attCavalryT1" value="0"/> 
+                T2: <input type="text" name="attCavalryT2" value="0"/>
+                T3: <input type="text" name="attCavalryT3" value="0"/>
+                T4: <input type="text" name="attCavalryT4" value="0"/>
+                T5: <input type="text" name="attCavalryT5" value="0"/>
+      <br>
+      Mage:     T1: <input type="text" name="attMageT1" value="0"/> 
+                T2: <input type="text" name="attMageT2" value="0"/>
+                T3: <input type="text" name="attMageT3" value="0"/>
+                T4: <input type="text" name="attMageT4" value="0"/>
+                T5: <input type="text" name="attMageT5" value="0"/>
+      <br>
+      Seals:    T1: <input type="text" name="attSealsT1" value="0"/> 
+                T2: <input type="text" name="attSealsT2" value="0"/>
+                T3: <input type="text" name="attSealsT3" value="0"/>
+                T4: <input type="text" name="attSealsT4" value="0"/>
+                T5: <input type="text" name="attSealsT5" value="0"/>
+
+      <br><br>
+      <text>Defender's Army: </text> 
+      <br>
+      Infantry: T1: <input type="text" name="defInfantryT1" value="0"/> 
+                T2: <input type="text" name="defInfantryT2" value="0"/>
+                T3: <input type="text" name="defInfantryT3" value="0"/>
+                T4: <input type="text" name="defInfantryT4" value="0"/>
+                T5: <input type="text" name="defInfantryT5" value="0"/>
+      <br>
+      Archers:  T1: <input type="text" name="defArchersT1" value="0"/> 
+                T2: <input type="text" name="defArchersT2" value="0"/>
+                T3: <input type="text" name="defArchersT3" value="0"/>
+                T4: <input type="text" name="defArchersT4" value="0"/>
+                T5: <input type="text" name="defArchersT5" value="0"/>
+      <br>
+      Cavalry:  T1: <input type="text" name="defCavalryT1" value="0"/> 
+                T2: <input type="text" name="defCavalryT2" value="0"/>
+                T3: <input type="text" name="defCavalryT3" value="0"/>
+                T4: <input type="text" name="defCavalryT4" value="0"/>
+                T5: <input type="text" name="defCavalryT5" value="0"/>
+      <br>
+      Mage:     T1: <input type="text" name="defMageT1" value="0"/> 
+                T2: <input type="text" name="defMageT2" value="0"/>
+                T3: <input type="text" name="defMageT3" value="0"/>
+                T4: <input type="text" name="defMageT4" value="0"/>
+                T5: <input type="text" name="defMageT5" value="0"/>
+      <br>
+      Seals:    T1: <input type="text" name="defSealsT1" value="0"/> 
+                T2: <input type="text" name="defSealsT2" value="0"/>
+                T3: <input type="text" name="defSealsT3" value="0"/>
+                T4: <input type="text" name="defSealsT4" value="0"/>
+                T5: <input type="text" name="defSealsT5" value="0"/>
+
+
+
+  		<!-- Tiers Types: <input type="text" name="t1" value="t1"/><input type="text" name="t2" value="t2"/><input type="text" name="t3" value="t3"/><input type="text" name="t4" value="t4"/><input type="text" name="t5" value="t5"/><br><br><br> -->
 	</form>
-	<form id="armies">
-    	<div>Attacker Army:</div>
-      <br>
-      Infantry T1: <input type="text" name="attInfantryT1" value="0"/>                    Infantry T1: <input type="text" name="defInfantryT1" value="0"/><br>
-      Archers T1: <input type="text" name="attArchersT1" value="0"/>                      Archers T1: <input type="text" name="defArchersT1" value="0"/><br>
-      Cavalry T1: <input type="text" name="attCavalryT1" value="0"/>                      Cavalry T1: <input type="text" name="defCavalryT1" value="0"/><br><br>
-      <br>
-      <br>
-      Infantry T2: <input type="text" name="attInfantryT2" value="0"/><br>
-      Archers T2: <input type="text" name="attArchersT2" value="0"/><br>
-      Cavalry T2: <input type="text" name="attCavalryT2" value="0"/><br>
-      <br>
-      <br>
-      Infantry T3: <input type="text" name="attInfantryT3" value="0"/><br>
-      Archers T3: <input type="text" name="attArchersT3" value="0"/><br>
-      Cavalry T3: <input type="text" name="attCavalryT3" value="0"/><br>
-      <br>
-      <br>
-      Infantry T4: <input type="text" name="attInfantryT4" value="0"/><br>
-      Archers T4: <input type="text" name="attArchersT4" value="0"/><br>
-      Cavalry T4: <input type="text" name="attCavalryT4" value="0"/><br>
-      <br>
-      <br>
-      Infantry T5: <input type="text" name="attInfantryT5" value="0"/><br>
-      Archers T5: <input type="text" name="attArchersT5" value="0"/><br>
-      Cavalry T5: <input type="text" name="attCavalryT5" value="0"/><br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <div>Defender Army:</div>
-      <br>
-      Infantry T1: <input type="text" name="defInfantryT1" value="0"/><br>
-      Archers T1: <input type="text" name="defArchersT1" value="0"/><br>
-      
-      <br>
-      <br>
-      Infantry T2: <input type="text" name="defInfantryT2" value="0"/><br>
-      Archers T2: <input type="text" name="defArchersT2" value="0"/><br>
-      Cavalry T2: <input type="text" name="defCavalryT2" value="0"/><br>
-      <br>
-      <br>
-      Infantry T3: <input type="text" name="defInfantryT3" value="0"/><br>
-      Archers T3: <input type="text" name="defArchersT3" value="0"/><br>
-      Cavalry T3: <input type="text" name="defCavalryT3" value="0"/><br>
-      <br>
-      <br>
-      Infantry T4: <input type="text" name="defInfantryT4" value="0"/><br>
-      Archers T4: <input type="text" name="defArchersT4" value="0"/><br>
-      Cavalry T4: <input type="text" name="defCavalryT4" value="0"/><br>
-      <br>
-      <br>
-      Infantry T5: <input type="text" name="defInfantryT5" value="0"/><br>
-      Archers T5: <input type="text" name="defArchersT5" value="0"/><br>
-      Cavalry T5: <input type="text" name="defCavalryT5" value="0"/><br>
-
-	</form>
-
-	<div id="log"></div>
-
-	
+  <button id="goToBattle">GO FIGHT!</button>
+	<div id="log"></div>	
   </body>
 </html>

@@ -16,50 +16,187 @@ window.onload = function(){ // Wait for DOM to load
 	    }
 	};
 
+	document.getElementById('goToBattle').onclick = function(e){
+     	setUpBattle();
+	};
+
+	function formSerialize(form){
+		if (!form || form.nodeName !== "FORM") {
+			return;
+		}
+		var i, j,
+		obj = {};
+		for (i = form.elements.length - 1; i >= 0; i = i - 1) {
+			if (form.elements[i].name === "") {
+				continue;
+			}
+			switch (form.elements[i].nodeName) {
+				case 'INPUT':
+					switch (form.elements[i].type) {
+					case 'text':
+						obj[form.elements[i].name] = encodeURIComponent(form.elements[i].value);
+					break;
+				}
+				break;
+			}
+		}
+		return obj;
+	};
+	
 	// --------------------------------- Start Flow Conditions--------------------------------------
 
 	(function main(){
-	    var x = document.getElementById("globalvars");
-	    var text = "";
-	    var i;
-	    for (i = 0; i < x.length ;i++) {
-	        text += x.elements[i].value + "<br>";
-	    }
 
-		this.numOfRounds = 8;
+	})();
+
+	function setUpBattle(){
+		 var formData = formSerialize(document.getElementById("globalvars"));
+	   
+		this.numOfRounds = formData['numOfRounds'];//8;
 		this.roundCount = 1;
-		this.fatalityPercent = 13;
-		this.accuracy = 1;
+		this.fatalityPercent = formData['fatalityPercent'];//13;
+		this.accuracy = formData['accuracy'];//1;
+		this.attBoostAtt = formData['attBoostAtt'];
+		this.attBoostDef = formData['attBoostDef'];
+		this.defBoostAtt = formData['defBoostAtt'];
+		this.defBoostDef = formData['defBoostDef'];
 		this.numOfTier = 3;
+		var troop1 = formData['troop1'];
+		var troop2 = formData['troop2'];
+		var troop3 = formData['troop3'];
+		var troop4 = formData['troop4'];
+		var troop5 = formData['troop5'];
 
-		this.troopsTypes = ['infantry', 'archers', 'cavalry'];
-		this.tiers = ['t1', 't2', 't3'];
+		this.troopsTypes = [troop1, troop2, troop3, troop4, troop5];
+		this.tiers = ['t1', 't2', 't3', 't4', 't5'];
 
-		this.troopsRps = 	{'infantry': {"infantryAtt": 1.0, "infantryDef": 1.0, "archersAtt": 2.0, "archersDef": 2.0, "cavalryAtt": 0.5, "cavalryDef": 0.5},
-	    					 'archers':  {"infantryAtt": 0.5, "infantryDef": 0.5, "archersAtt": 1.0, "archersDef": 1.0, "cavalryAtt": 2.0, "cavalryDef": 2.0},
-	    					 'cavalry':  {"infantryAtt": 2.0, "infantryDef": 2.0, "archersAtt": 0.5, "archersDef": 0.5, "cavalryAtt": 1.0, "cavalryDef": 1.0}};
+		//Average Might	T1	T2	T3	T4
+		//Troops	   2.25	4.5	8.5	17
+		//Seals	        3	 6	12	24
+		this.avgMight = {"t1": 2.25, "t2": 4.5, "t3": 8.5, "t4": 17, "t5": 1};
 
-		this.attArmy = {'infantry' : {'t1' : 0, 't2' : 0, 't3' : 9000},
-					   	'archers' : {'t1' : 0, 't2' : 0, 't3' : 6000},
-					   	'cavalry' : {'t1' : 0, 't2' : 0, 't3' : 0}};
+		this.mightCoef = {'infantry' : {'t1' : parseInt(formData['mightCoInfantryT1']), 't2' : parseInt(formData['mightCoInfantryT2']), 't3' : parseInt(formData['mightCoInfantryT3']), 't4' : parseInt(formData['mightCoInfantryT4']), 't5' : parseInt(formData['mightCoInfantryT5'])},
+					   	'archers' : {'t1' : parseInt(formData['mightCoArchersT1']), 't2' : parseInt(formData['mightCoArchersT2']), 't3' : parseInt(formData['mightCoArchersT3']), 't4' : parseInt(formData['mightCoArchersT4']), 't5' : parseInt(formData['mightCoArchersT5'])},
+					   	'cavalry' : {'t1' : parseInt(formData['mightCoCavalryT1']), 't2' : parseInt(formData['mightCoCavalryT2']), 't3' : parseInt(formData['mightCoCavalryT3']), 't4' : parseInt(formData['mightCoCavalryT4']), 't5' : parseInt(formData['mightCoCavalryT5'])},
+					    'mage' : {'t1' : parseInt(formData['mightCoMageT1']), 't2' : parseInt(formData['mightCoMageT2']), 't3' : parseInt(formData['mightCoMageT3']), 't4' : parseInt(formData['mightCoMageT4']), 't5' : parseInt(formData['mightCoMageT5'])},
+					    'seals' : {'t1' : parseInt(formData['mightCoSealsT1']), 't2' : parseInt(formData['mightCoSealsT2']), 't3' : parseInt(formData['mightCoSealsT3']), 't4' : parseInt(formData['mightCoSealsT4']), 't5' : parseInt(formData['mightCoSealsT5'])}};
 
-		this.defArmy = {'infantry' : {'t1' : 60, 't2' : 300, 't3' : 3000},
-					   	'archers' : {'t1' : 0, 't2' : 0, 't3' : 0},
-					   	'cavalry' : {'t1' : 0, 't2' : 0, 't3' : 0}};
+		
+			//mage -> infantry 3/2,   2/3
+			//mage -> seals 2, 0.5
+
+			//seals -> ?
+		this.troopsRps = 	
+		  { 'infantry': 
+		    { "infantryAtt" : parseFloat(formData['inf_infantryAtt'])
+		    , "infantryDef": parseFloat(formData['inf_infantryDef'])
+		    , "archersAtt" : parseFloat(formData['inf_archersAtt'])
+		    , "archersDef" : parseFloat(formData['inf_archersDef'])
+		    , "cavalryAtt" : parseFloat(formData['inf_cavalryAtt'])
+		    , "cavalryDef" : parseFloat(formData['inf_cavalryDef'])
+		    , "mageAtt" : parseFloat(formData['inf_mageAtt'])
+		    , "mageDef" : parseFloat(formData['inf_mageDef'])
+		    , "sealsAtt" : parseFloat(formData['inf_sealsAtt'])
+		    , "sealsDef" : parseFloat(formData['inf_sealsDef'])
+		    }
+		  , 'archers':  
+		    { "infantryAtt" : parseFloat(formData['arch_infantryAtt'])
+		    , "infantryDef": parseFloat(formData['arch_infantryDef'])
+		    , "archersAtt" : parseFloat(formData['arch_archersAtt'])
+		    , "archersDef" : parseFloat(formData['arch_archersDef'])
+		    , "cavalryAtt" : parseFloat(formData['arch_cavalryAtt'])
+		    , "cavalryDef" : parseFloat(formData['arch_cavalryDef'])
+		    , "mageAtt" : parseFloat(formData['arch_mageAtt'])
+		    , "mageDef" : parseFloat(formData['arch_mageDef'])
+		    , "sealsAtt" : parseFloat(formData['arch_sealsAtt'])
+		    , "sealsDef" : parseFloat(formData['arch_sealsDef'])
+		    }
+		  , 'cavalry':  
+		    { "infantryAtt" : parseFloat(formData['cav_infantryAtt'])
+		    , "infantryDef": parseFloat(formData['cav_infantryDef'])
+		    , "archersAtt" : parseFloat(formData['cav_archersAtt'])
+		    , "archersDef" : parseFloat(formData['cav_archersDef'])
+		    , "cavalryAtt" : parseFloat(formData['cav_cavalryAtt'])
+		    , "cavalryDef" : parseFloat(formData['cav_cavalryDef'])
+		    , "mageAtt" : parseFloat(formData['cav_mageAtt'])
+		    , "mageDef" : parseFloat(formData['cav_mageDef'])
+		    , "sealsAtt" : parseFloat(formData['cav_sealsAtt'])
+		    , "sealsDef" : parseFloat(formData['cav_sealsDef'])
+		    }
+		   , 'mage':  
+		    { "infantryAtt" : parseFloat(formData['mage_infantryAtt'])
+		    , "infantryDef": parseFloat(formData['mage_infantryDef'])
+		    , "archersAtt" : parseFloat(formData['mage_archersAtt'])
+		    , "archersDef" : parseFloat(formData['mage_archersDef'])
+		    , "cavalryAtt" : parseFloat(formData['mage_cavalryAtt'])
+		    , "cavalryDef" : parseFloat(formData['mage_cavalryDef'])
+		    , "mageAtt" : parseFloat(formData['mage_mageAtt'])
+		    , "mageDef" : parseFloat(formData['mage_mageDef'])
+		    , "sealsAtt" : parseFloat(formData['mage_sealsAtt'])
+		    , "sealsDef" : parseFloat(formData['mage_sealsDef'])
+		    }
+		   , 'seals':  
+		    { "infantryAtt" : parseFloat(formData['seals_infantryAtt'])
+		    , "infantryDef": parseFloat(formData['seals_infantryDef'])
+		    , "archersAtt" : parseFloat(formData['seals_archersAtt'])
+		    , "archersDef" : parseFloat(formData['seals_archersDef'])
+		    , "cavalryAtt" : parseFloat(formData['seals_cavalryAtt'])
+		    , "cavalryDef" : parseFloat(formData['seals_cavalryDef'])
+		    , "mageAtt" : parseFloat(formData['seals_mageAtt'])
+		    , "mageDef" : parseFloat(formData['seals_mageDef'])
+		    , "sealsAtt" : parseFloat(formData['seals_sealsAtt'])
+		    , "sealsDef" : parseFloat(formData['seals_sealsDef'])
+		    }
+		  };
+
+		   this.attArmy = {'infantry' : {'t1' : parseInt(formData['attInfantryT1']), 't2' : parseInt(formData['attInfantryT2']), 't3' : parseInt(formData['attInfantryT3']), 't4' : parseInt(formData['attInfantryT4']), 't5' : parseInt(formData['attInfantryT5'])},
+					   	'archers' : {'t1' : parseInt(formData['attArchersT1']), 't2' : parseInt(formData['attArchersT2']), 't3' : parseInt(formData['attArchersT3']), 't4' : parseInt(formData['attArchersT4']), 't5' : parseInt(formData['attArchersT5'])},
+					   	'cavalry' : {'t1' : parseInt(formData['attCavalryT1']), 't2' : parseInt(formData['attCavalryT2']), 't3' : parseInt(formData['attCavalryT3']), 't4' : parseInt(formData['attCavalryT4']), 't5' : parseInt(formData['attCavalryT5'])},
+					    'mage' : {'t1' : parseInt(formData['attMageT1']), 't2' : parseInt(formData['attMageT2']), 't3' : parseInt(formData['attMageT3']), 't4' : parseInt(formData['attMageT4']), 't5' : parseInt(formData['attMageT5'])},
+					    'seals' : {'t1' : parseInt(formData['attSealsT1']), 't2' : parseInt(formData['attSealsT2']), 't3' : parseInt(formData['attSealsT3']), 't4' : parseInt(formData['attSealsT4']), 't5' : parseInt(formData['attSealsT5'])}};
+
+			
+			this.defArmy = {'infantry' : {'t1' : parseInt(formData['defInfantryT1']), 't2' : parseInt(formData['defInfantryT2']), 't3' : parseInt(formData['defInfantryT3']), 't4' : parseInt(formData['defInfantryT4']), 't5' : parseInt(formData['defInfantryT5'])},
+					   	'archers' : {'t1' : parseInt(formData['defArchersT1']), 't2' : parseInt(formData['defArchersT2']), 't3' : parseInt(formData['defArchersT3']), 't4' : parseInt(formData['defArchersT4']), 't5' : parseInt(formData['defArchersT5'])},
+					   	'cavalry' : {'t1' : parseInt(formData['defCavalryT1']), 't2' : parseInt(formData['defCavalryT2']), 't3' : parseInt(formData['defCavalryT3']), 't4' : parseInt(formData['defCavalryT4']), 't5' : parseInt(formData['defCavalryT5'])},
+					    'mage' : {'t1' : parseInt(formData['defMageT1']), 't2' : parseInt(formData['defMageT2']), 't3' : parseInt(formData['defMageT3']), 't4' : parseInt(formData['defMageT4']), 't5' : parseInt(formData['defMageT5'])},
+					    'seals' : {'t1' : parseInt(formData['defSealsT1']), 't2' : parseInt(formData['defSealsT2']), 't3' : parseInt(formData['defSealsT3']), 't4' : parseInt(formData['defSealsT4']), 't5' : parseInt(formData['attSealsT5'])}};
+
+
+		// this.attArmy = {'infantry' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		// 			   	'archers' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		// 			   	'cavalry' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		// 			    'mage' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		// 			    'seals' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0}};
+
+		// this.defArmy = {'infantry' : {'t1' : 5000, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		// 			   	'archers' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		// 			   	'cavalry' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		// 			   	'mage' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		// 			    'seals' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0}};
 			
 		this.armyStatePerRound = [[attArmy, defArmy]];
 		this.battleLog = {};
 		this.endOfBattleAttArmyState = JSON.parse(JSON.stringify(attArmy));
 		this.endOfBattleDefArmyState = JSON.parse(JSON.stringify(defArmy));
-		
-		makeJSON();
+		this.attTroppsLost = {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0};
+		this.defTroopsLost = {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0};
 
 		setUpRound();
+	};
 
-	})();
+	function initArmy(army){
+		
+		var i = 0;
+		for(i = 0; i < troopsTypes.length; i++){
+
+			armySum += (army[troopsTypes[i]].t1 + army[troopsTypes[i]].t2 + army[troopsTypes[i]].t3);
+		}
+
+		return armySum;
+	};
 
 	// ----------------------------------------- Main Flow ---------------------------------------------
-
 
 	function setUpRound(){
 
@@ -88,25 +225,29 @@ window.onload = function(){ // Wait for DOM to load
 				console.log(' >>>>>>>>>>>>>>>>>>>>> BATTLE IS OVER <<<<<<<<<<<<<<<<<<<<<');
 				//console.log('Battle is over - Defender lost the battle');
 				produceBattleReport();
+				declareWinner();
 				return;
 			}
 			if(calcArmySum(attArmyCalc) === 0){
 				console.log(' >>>>>>>>>>>>>>>>>>>>> BATTLE IS OVER <<<<<<<<<<<<<<<<<<<<<');
 				//console.log('Battle is over - Attacker lost the battle');
 				produceBattleReport();
+				declareWinner();
 				return;
 			}
 
 			console.log(' >>>>>>>>>>>>>>>>>>>>> ROUND ' + (k + 1) + ' <<<<<<<<<<<<<<<<<<<<<');
 
 			defTroopForThisRound = findWeakestTroop(defArmyCalc); 
-			if(split){
+			attTroopForThisRound = findWeakestTroop(attArmyCalc);
+			if(split && (attTroopForThisRound.quantity > defTroopForThisRound.quantity)){
 				defTroopRatio = calcWeakestDefTroopRatio(defTroopForThisRound, defArmyCalc);
 				splittedAttArmy = splitAttArmy(attArmyCalc, defTroopRatio);
 				//lastSplittedAttArmy=JSON.parse(JSON.stringify(splittedAttArmy));
 				
 			}
 			else{
+				splittedAttArmy = attArmyCalc;
 				//attTroopForThisRound = findWeakestTroop(lastSplittedAttArmy);
 			}
 			attTroopForThisRound = findWeakestTroop(splittedAttArmy);
@@ -119,8 +260,8 @@ window.onload = function(){ // Wait for DOM to load
 			split = executeRound(attTroopForThisRound, defTroopForThisRound, attArmyCalc, defArmyCalc, attArmyCopy, defArmyCopy, splittedAttArmy);	
 		}
 		console.log(' >>>>>>>>>>>>>>>>>>>>> BATTLE IS OVER <<<<<<<<<<<<<<<<<<<<<');
-		console.log('Battle is over - Reached the Max number of rounds');
 		produceBattleReport();
+		declareWinner();
 	};
 
 	function executeRound(attTroopForThisRound, defTroopForThisRound, attArmyCalc, defArmyCalc, attArmyCopy, defArmyCopy, splittedAttArmy){
@@ -157,7 +298,9 @@ window.onload = function(){ // Wait for DOM to load
 		armyStatePerRound[roundCount] = [attArmyCopy, defArmyCopy];
 		battleLog[roundCount-1] = {'attTroop': attTroopForThisRound, 'attTroopLosses' : attLoses, 'defTroop': defTroopForThisRound, 'defTroopLosses': defLoses};
 		endOfBattleAttArmyState[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attLoses;
+		attTroppsLost[attTroopForThisRound.tier] += attLoses;
 		endOfBattleDefArmyState[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defLoses;
+		defTroopsLost[defTroopForThisRound.tier] += defLoses;
 
 		console.log('Round result:');
 		console.log('Defender troop lost: ' + defLoses);	
@@ -184,6 +327,12 @@ window.onload = function(){ // Wait for DOM to load
 		for (i = 0; i < troopsTypes.length; i++){
 			army[troopsTypes[i]].t3 *= defTroopRatio;
 		}
+		for (i = 0; i < troopsTypes.length; i++){
+			army[troopsTypes[i]].t4 *= defTroopRatio;
+		}
+		for (i = 0; i < troopsTypes.length; i++){
+			army[troopsTypes[i]].t5 *= defTroopRatio;
+		}
 		return army;
 	};
 
@@ -191,14 +340,13 @@ window.onload = function(){ // Wait for DOM to load
 		// Looking for the lowest "tier" in the defending army, 
 		// if there are two troops type with the same "tier", the smaller amount in size is chosen.
 		// If both "tier" and quantity are equal, the order will be : infantry --> archers --> cavalry.
-		var defTroopForThisRound = {'troop' : '', 'tier' : '', 'quantity' : ''};
+		var weakestTroop = {'troop' : '', 'tier' : '', 'quantity' : ''};
 		var i,j = 0;
 		var tierType = null;
 		for(j=0; j<tiers.length; j++){
 			for (i = 0	; i < troopsTypes.length; i++){
 				if(army[troopsTypes[i]][tiers[j]] > 0){	//check that the kind of troop exists in the def army.
-					defTroopForThisRound = {'troop' : troopsTypes[i], 'tier' : tiers[j], 'quantity' : army[troopsTypes[i]][tiers[j]]};
-					return defTroopForThisRound;
+					return weakestTroop = {'troop' : troopsTypes[i], 'tier' : tiers[j], 'quantity' : army[troopsTypes[i]][tiers[j]]};
 				}
 			}
 		}
@@ -221,6 +369,7 @@ window.onload = function(){ // Wait for DOM to load
 
 		return armySum;
 	};
+
 	function calcMinAtt(attTroopForThisRound, defTroopForThisRound){
 		var defResilience = 1;
 		var acr = 1;
@@ -232,6 +381,12 @@ window.onload = function(){ // Wait for DOM to load
 		}
 		if(defTroopForThisRound.tier === 't3'){
 			defResilience = 3;
+		}
+		if(defTroopForThisRound.tier === 't4'){
+			defResilience = 4;
+		}
+		if(defTroopForThisRound.tier === 't5'){
+			defResilience = 5;
 		}
 
 		numOfAttTroopToKillAllDefTroop = (defTroopForThisRound.quantity * defTroopForThisRound.quantity * defResilience) / 
@@ -248,9 +403,9 @@ window.onload = function(){ // Wait for DOM to load
 
 	function calcDefenderLosses(attTroopForThisRound, defTroopForThisRound){
 
-		//         Na           Att * RPSa(dc) 
+		//         Na           Att * RPSa(dc)*boostatt 
 	    //Kills = ---- * Acr * ---------------- * F * Fr
-	    //         Nd                Rd
+	    //         Nd                Rd*boostdef
 	    //  |------1-----|-------2----------|---3----|
 
 	    //Tier		Attack Rating	Defense Rating	Resilience Rating
@@ -272,12 +427,12 @@ window.onload = function(){ // Wait for DOM to load
 
 		var Na = attTroopForThisRound.quantity;  //Number of Troops in the Attacker’s side
 		var Nd = defTroopForThisRound.quantity;   //Number of Troops in the Defender’s side
-		var Att = attTroopForThisRound.quantity;//Attack net Ratio of Attacker Unit  (after attack boost impacts)
+		var Att = attTroopForThisRound.quantity * attBoostAtt;//Attack net Ratio of Attacker Unit  (after attack boost impacts)
 		var Acr = accuracy;  //Accuracy of Attacker troop (includes the random factor)
 		var RPSa = troopsRps[defTroopForThisRound.troop][attTroopForThisRound.troop + 'Att']; //Attacker-Type’s RPS Ratio against the Defender Type
 		var F = fatalityPercent;    //fatality ratio
 		var Fr = ((fatalityPercent/numOfRounds)/100);    //fatality ratio per round  <<<< Does fatality ratio changes form round to round? <<<<<<<<
-		var Rd = defResilience;   //Defender’s Resilience net ratio (after defense and health boosts impacts).
+		var Rd = defResilience * defBoostDef;   //Defender’s Resilience net ratio (after defense and health boosts impacts).
 
 		var temp1 = (Na/Nd)*Acr;
 		var temp2 = (Att*RPSa)/Rd;
@@ -307,12 +462,12 @@ window.onload = function(){ // Wait for DOM to load
 
 		var Na = minAtt;  //Number of Troops in the Attacker’s side
 		var Nd = defTroopForThisRound.quantity;  //Number of Troops in the Defender’s side
-		var Def = defTroopForThisRound.quantity; //Defence net Ratio of Defender’s Unit  (after defence boost impacts)
+		var Def = defTroopForThisRound.quantity * defBoostAtt; //Defence net Ratio of Defender’s Unit  (after defence boost impacts)
 		var Acr = accuracy;  //Accuracy of Defender troop (includes the random factor)
 		var RPSd = troopsRps[attTroopForThisRound.troop][defTroopForThisRound.troop + 'Def']; //Attacker-Type’s RPS Ratio against the Defender Type
 		var F = fatalityPercent;    //fatality ratio
 		var Fr = ((fatalityPercent/numOfRounds)/100);   //fatality ratio per round 
-		var Ra = attResilience;   //Attacker’s Resilience net ratio (after defense and health boosts impacts).
+		var Ra = attResilience * attBoostDef;   //Attacker’s Resilience net ratio (after defense and health boosts impacts).
 
 		var temp1 = (Nd/Na)*Acr;
 		var temp2 = (Def*RPSd)/Ra;
@@ -321,29 +476,46 @@ window.onload = function(){ // Wait for DOM to load
 
 		return attackerLosses;
 	};
+	
+	function calcMight(troopLost){
+		var i = 0;
+		var might = 0;
+
+		for(i=0; i<tiers.length; i++){
+			might += troopLost[tiers[i]] * avgMight[tiers[i]]; //mightCoef[troopLost.troop][tiers[i]]
+		}
+
+		return might;
+	};
 
 	function produceBattleReport(){
 		console.log('Attacker army end of battle state : ');
 		console.log(JSON.stringify(endOfBattleAttArmyState));
-		console.log('Attacker army end of battle state : ');
+		console.log('Defender army end of battle state : ');
 		console.log(JSON.stringify(endOfBattleDefArmyState));
 	};
 
 	function declareWinner(){
 
-		//Victory is determined as follows:
-		// 1. If an army lost all his troops 
-		// 2. If both armies loast some troops the one that lost more (in quantity not by type or tier) loses the battle.
+		var attMightLost = calcMight(attTroppsLost);
+		var defMightLost = calcMight(defTroopsLost);
+		var attWL = 0;
+		var defWL = 0;
 
-		if(calcArmySum(endOfBattleAttArmyState) === 0){
-			console.log('Attacker Lost');
+		if(defMightLost > attMightLost){
+			console.log('Attacker won the battle! ');
+
 		}
-		if(calcArmySum(endOfBattleDefArmyState) === 0){
-			console.log('Defender Lost');
+		if(defMightLost === attMightLost){
+			console.log('Its a tie');
+
 		}
-		if((calcArmySum(endOfBattleDefArmyState) === 0) && (calcArmySum(endOfBattleAttArmyState) === 0)){
-			console.log('Both Armys are gone!');
+		if(defMightLost < attMightLost){
+			console.log('Defender won the battle! ');
 		}
+		console.log('Attacker might lost =  ' + attMightLost);
+		console.log('Defender might lost =  ' + defMightLost);
+
 	};
 
 	function makeJSON(){
