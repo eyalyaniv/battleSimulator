@@ -4,21 +4,21 @@
     <script type="text/javascript" src="sim.js"></script>
   </head>
   <body bgcolor=white>
-  	<div id="div1">Sky Wars Battle simulator</div>
-
-    
-
+  	<div id="div1" style="color:blue">Sky Wars Battle simulator</div>
+    <br>
     <form id="globalvars">
-      <text>Defender boosts: </text>
+      <text style="color:brown">Defender boosts: </text><br>
       Attack Boost: <input type="text" name="defBoostAtt" value="1"/> Defence Boost: <input type="text" name="defBoostDef" value="1"/><br>
-      <text>Attacker boosts: </text>
+      <text style="color:brown" >Attacker boosts: </text><br>
       Attack Boost: <input type="text" name="attBoostAtt" value="1"/> Defence Boost: <input type="text" name="attBoostDef" value="1"/><br>
+      <br>
   		Number Of Rounds: <input type="text" name="numOfRounds" value="8"/>
-  		Fatality percent: <input type="text" name="fatalityPercent" value="13"/>
+  		Fatality percent: <input type="text" name="fatalityPercent" value="10"/>
   		Accuracy: <input type="text" name="accuracy" value="1"/><br>
   		Troops Types: <input type="text" name="troop1" value="infantry"/><input type="text" name="troop2" value="archers"/><input type="text" name="troop3" value="cavalry"/><input type="text" name="troop4" value="mage"/><input type="text" name="troop5" value="seals"/>
       <br>
-      <text>Troops RPS</text>
+      <br>
+      <text style="color:brown">Troops RPS</text>
       <br>
       Infantry:  <br>infantryAtt: <input type="text" name="inf_infantryAtt" value="1"/> <br> 
                 infantryDef: <input type="text" name="inf_infantryDef" value="1"/> <br>
@@ -75,43 +75,44 @@
                 sealsAtt: <input type="text" name="seals_sealsAtt" value="1"/> <br>
                 sealsDef: <input type="text" name="seals_sealsDef" value="1"/> <br>
       <br>
-      <text>Might Coefficient</text>
+      <text style="color:brown">Might Coefficient</text>
       <br>
-      Infantry: T1: <input type="text" name="mightCoInfantryT1" value="2.25"/> 
-                T2: <input type="text" name="mightCoInfantryT2" value="4.5"/>
-                T3: <input type="text" name="mightCoInfantryT3" value="8.5"/>
-                T4: <input type="text" name="mightCoInfantryT4" value="17"/>
+      Infantry: T1: <input type="text" name="mightCoInfantryT1" value="2"/> 
+                T2: <input type="text" name="mightCoInfantryT2" value="4"/>
+                T3: <input type="text" name="mightCoInfantryT3" value="8"/>
+                T4: <input type="text" name="mightCoInfantryT4" value="16"/>
                 T5: <input type="text" name="mightCoInfantryT5" value="0"/>
       <br>
-      Archers:  T1: <input type="text" name="mightCoArchersT1" value="2.25"/> 
-                T2: <input type="text" name="mightCoArchersT2" value="4.5"/>
-                T3: <input type="text" name="mightCoArchersT3" value="8.5"/>
-                T4: <input type="text" name="mightCoArchersT4" value="17"/>
+      Archers:  T1: <input type="text" name="mightCoArchersT1" value="2"/> 
+                T2: <input type="text" name="mightCoArchersT2" value="4"/>
+                T3: <input type="text" name="mightCoArchersT3" value="8"/>
+                T4: <input type="text" name="mightCoArchersT4" value="16"/>
                 T5: <input type="text" name="mightCoArchersT5" value="0"/>
       <br>
-      Cavalry:  T1: <input type="text" name="mightCoCavalryT1" value="2.25"/> 
-                T2: <input type="text" name="mightCoCavalryT2" value="4.5"/>
-                T3: <input type="text" name="mightCoCavalryT3" value="8.5"/>
-                T4: <input type="text" name="mightCoCavalryT4" value="17"/>
+      Cavalry:  T1: <input type="text" name="mightCoCavalryT1" value="2"/> 
+                T2: <input type="text" name="mightCoCavalryT2" value="4"/>
+                T3: <input type="text" name="mightCoCavalryT3" value="8"/>
+                T4: <input type="text" name="mightCoCavalryT4" value="16"/>
                 T5: <input type="text" name="mightCoCavalryT5" value="0"/>
       <br>
-      Mage:     T1: <input type="text" name="mightCoMageT1" value="2.25"/> 
-                T2: <input type="text" name="mightCoMageT2" value="4.5"/>
-                T3: <input type="text" name="mightCoMageT3" value="8.5"/>
-                T4: <input type="text" name="mightCoMageT4" value="17"/>
+      Mage:     T1: <input type="text" name="mightCoMageT1" value="3"/> 
+                T2: <input type="text" name="mightCoMageT2" value="6"/>
+                T3: <input type="text" name="mightCoMageT3" value="10"/>
+                T4: <input type="text" name="mightCoMageT4" value="20"/>
                 T5: <input type="text" name="mightCoMageT5" value="0"/>
       <br>
       Seals:    T1: <input type="text" name="mightCoSealsT1" value="3"/> 
                 T2: <input type="text" name="mightCoSealsT2" value="6"/>
                 T3: <input type="text" name="mightCoSealsT3" value="12"/>
                 T4: <input type="text" name="mightCoSealsT4" value="24"/>
-                T5: <input type="text" name="mightCoSealsT5" value="36"/>
+                T5: <input type="text" name="mightCoSealsT5" value="0"/>
       <br>
-      <text>Armies: </text>
+      <br>
+      <text style="color:brown"> --------------------------- Armies: ------------------------------------</text>
       <br><br>
-      <text>Attacker's Army: </text> 
+      <text style="color:brown">Attacker's Army: </text> 
       <br>
-      Infantry: T1: <input type="text" name="attInfantryT1" value="0"/> 
+      Infantry: T1: <input type="text" name="attInfantryT1" value="1000"/> 
                 T2: <input type="text" name="attInfantryT2" value="0"/>
                 T3: <input type="text" name="attInfantryT3" value="0"/>
                 T4: <input type="text" name="attInfantryT4" value="0"/>
@@ -144,7 +145,7 @@
       <br><br>
       <text>Defender's Army: </text> 
       <br>
-      Infantry: T1: <input type="text" name="defInfantryT1" value="0"/> 
+      Infantry: T1: <input type="text" name="defInfantryT1" value="1000"/> 
                 T2: <input type="text" name="defInfantryT2" value="0"/>
                 T3: <input type="text" name="defInfantryT3" value="0"/>
                 T4: <input type="text" name="defInfantryT4" value="0"/>
@@ -178,7 +179,8 @@
 
   		<!-- Tiers Types: <input type="text" name="t1" value="t1"/><input type="text" name="t2" value="t2"/><input type="text" name="t3" value="t3"/><input type="text" name="t4" value="t4"/><input type="text" name="t5" value="t5"/><br><br><br> -->
 	</form>
-  <button id="goToBattle">GO FIGHT!</button>
+  <button id="goToBattle" style="background:red">GO FIGHT!</button><br>
+  <text style="color:brown"> --------------------------- Battle Report: ------------------------------------</text>
 	<div id="log"></div>	
   </body>
 </html>

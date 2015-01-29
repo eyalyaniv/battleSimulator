@@ -1,20 +1,20 @@
 window.onload = function(){ // Wait for DOM to load
-	var console = {};
-	console.log = function(){ //Override native console.log and print to div in DOM
-		if (!console) {
-	        console = {};
-	    }
-	    var old = console.log;
+	// var console = {};
+	// console.log = function(){ //Override native console.log and print to div in DOM
+	// 	if (!console) {
+	//         console = {};
+	//     }
+	//     var old = console.log;
 	    
-	    console.log = function (message) {
-	    	var logger = document.getElementById('log');
-	        if (typeof message == 'object') {
-	            logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : String(message)) + '<br />';
-	        } else {
-	            logger.innerHTML += message + '<br />';
-	        }
-	    }
-	};
+	//     console.log = function (message) {
+	//     	var logger = document.getElementById('log');
+	//         if (typeof message == 'object') {
+	//             logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : String(message)) + '<br />';
+	//         } else {
+	//             logger.innerHTML += message + '<br />';
+	//         }
+	//     }
+	// };
 
 	document.getElementById('goToBattle').onclick = function(e){
      	setUpBattle();
@@ -198,6 +198,11 @@ window.onload = function(){ // Wait for DOM to load
 
 	// ----------------------------------------- Main Flow ---------------------------------------------
 
+	// 1. Find the weakest attacker troop and the weakest defender troop
+	// 2. Decide if to split the attacker army
+	//		- If both troops are equal no need to split and can reach the max number of rounds
+	//		- If 
+
 	function setUpRound(){
 
 		var k = 0;
@@ -240,7 +245,7 @@ window.onload = function(){ // Wait for DOM to load
 
 			defTroopForThisRound = findWeakestTroop(defArmyCalc); 
 			attTroopForThisRound = findWeakestTroop(attArmyCalc);
-			if(split && (attTroopForThisRound.quantity > defTroopForThisRound.quantity)){
+			if(split /*&& (attTroopForThisRound.quantity >= defTroopForThisRound.quantity)*/){
 				defTroopRatio = calcWeakestDefTroopRatio(defTroopForThisRound, defArmyCalc);
 				splittedAttArmy = splitAttArmy(attArmyCalc, defTroopRatio);
 				//lastSplittedAttArmy=JSON.parse(JSON.stringify(splittedAttArmy));
@@ -268,6 +273,16 @@ window.onload = function(){ // Wait for DOM to load
 		var defLoses = null;
 		var attLoses = null;
 		var minAtt = calcMinAtt(attTroopForThisRound,defTroopForThisRound); //
+		//min attack can be smaller equal or bigger than the attacker troop size
+
+		//Scenario 1: the attacker army dosent need to use all it's troops yet he has more than the defender.
+		// if((minAtt < attTroopForThisRound.quantity) && (minAtt > defTroopForThisRound.quantity){
+
+		// }
+
+		// if((minAtt === attTroopForThisRound.quantity) && (attTroopForThisRound.quantity === defTroopForThisRound.quantity){
+
+		// }
 
 		if(minAtt === attTroopForThisRound.quantity){ //Means attacker army need to use all the troop devision
 			defLoses = calcDefenderLosses(attTroopForThisRound, defTroopForThisRound);  
@@ -306,6 +321,7 @@ window.onload = function(){ // Wait for DOM to load
 		console.log('Defender troop lost: ' + defLoses);	
 		console.log('Attacker troop lost: ' + attLoses);	 
 		roundCount++;
+
 		if(defLoses < defTroopForThisRound.quantity){
 				splittedAttArmy[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attTroopForThisRound.quantity;
 				return false;
@@ -313,6 +329,10 @@ window.onload = function(){ // Wait for DOM to load
 		else{
 			return true;
 		}
+	};
+
+	function excecuteRound2(attTroopForThisRound, defTroopForThisRound, attArmyCalc, defArmyCalc, attArmyCopy, defArmyCopy, splittedAttArmy){
+
 	};
 
 	// ----------------------------------------- Flow Supporting Utils ---------------------------------------------
@@ -390,7 +410,7 @@ window.onload = function(){ // Wait for DOM to load
 		}
 
 		numOfAttTroopToKillAllDefTroop = (defTroopForThisRound.quantity * defTroopForThisRound.quantity * defResilience) / 
-		      (attTroopForThisRound.quantity * acr * troopsRps[defTroopForThisRound.troop][attTroopForThisRound.troop + 'Att'] * fatalityPercent * ((fatalityPercent/numOfRounds)/100));
+		      (attTroopForThisRound.quantity * acr * troopsRps[defTroopForThisRound.troop][attTroopForThisRound.troop + 'Att'] /* fatalityPercent*/ * ((fatalityPercent/numOfRounds)/100));
 
 		if((attTroopForThisRound.quantity - numOfAttTroopToKillAllDefTroop) > 0){ //Meaning the attacker troop has enought troops to kill all defender troop
 			return numOfAttTroopToKillAllDefTroop;
@@ -403,9 +423,9 @@ window.onload = function(){ // Wait for DOM to load
 
 	function calcDefenderLosses(attTroopForThisRound, defTroopForThisRound){
 
-		//         Na           Att * RPSa(dc)*boostatt 
-	    //Kills = ---- * Acr * ---------------- * F * Fr
-	    //         Nd                Rd*boostdef
+		//         Na           Att * RPSa(dc)* boostatt 
+	    //Kills = ---- * Acr * ------------------------  * F * Fr
+	    //         Nd                Rd* boostdef
 	    //  |------1-----|-------2----------|---3----|
 
 	    //Tier		Attack Rating	Defense Rating	Resilience Rating
@@ -424,6 +444,12 @@ window.onload = function(){ // Wait for DOM to load
 		if(defTroopForThisRound.tier === 't3'){
 			defResilience = 3;
 		}
+		if(defTroopForThisRound.tier === 't4'){
+			defResilience = 4;
+		}
+		if(defTroopForThisRound.tier === 't5'){
+			defResilience = 5;
+		}
 
 		var Na = attTroopForThisRound.quantity;  //Number of Troops in the Attacker’s side
 		var Nd = defTroopForThisRound.quantity;   //Number of Troops in the Defender’s side
@@ -431,13 +457,13 @@ window.onload = function(){ // Wait for DOM to load
 		var Acr = accuracy;  //Accuracy of Attacker troop (includes the random factor)
 		var RPSa = troopsRps[defTroopForThisRound.troop][attTroopForThisRound.troop + 'Att']; //Attacker-Type’s RPS Ratio against the Defender Type
 		var F = fatalityPercent;    //fatality ratio
-		var Fr = ((fatalityPercent/numOfRounds)/100);    //fatality ratio per round  <<<< Does fatality ratio changes form round to round? <<<<<<<<
+		var Fr = ((fatalityPercent/(numOfRounds*100)));    //fatality ratio per round  <<<< Does fatality ratio changes form round to round? <<<<<<<<
 		var Rd = defResilience * defBoostDef;   //Defender’s Resilience net ratio (after defense and health boosts impacts).
 
 		var temp1 = (Na/Nd)*Acr;
 		var temp2 = (Att*RPSa)/Rd;
 
-		defenderLosses = temp1 * temp2 * F * Fr; 
+		defenderLosses = temp1 * temp2 /* *F */* Fr; 
 
 		return defenderLosses;
 	};
@@ -459,6 +485,12 @@ window.onload = function(){ // Wait for DOM to load
 		if(attTroopForThisRound.tier === 't3'){
 			attResilience = 3;
 		}
+		if(attTroopForThisRound.tier === 't4'){
+			attResilience = 4;
+		}
+		if(attTroopForThisRound.tier === 't5'){
+			attResilience = 5;
+		}
 
 		var Na = minAtt;  //Number of Troops in the Attacker’s side
 		var Nd = defTroopForThisRound.quantity;  //Number of Troops in the Defender’s side
@@ -472,7 +504,7 @@ window.onload = function(){ // Wait for DOM to load
 		var temp1 = (Nd/Na)*Acr;
 		var temp2 = (Def*RPSd)/Ra;
 
-		attackerLosses = temp1 * temp2 * F * Fr; 
+		attackerLosses = temp1 * temp2 /** F */* Fr; 
 
 		return attackerLosses;
 	};
@@ -489,10 +521,10 @@ window.onload = function(){ // Wait for DOM to load
 	};
 
 	function produceBattleReport(){
-		console.log('Attacker army end of battle state : ');
-		console.log(JSON.stringify(endOfBattleAttArmyState));
-		console.log('Defender army end of battle state : ');
-		console.log(JSON.stringify(endOfBattleDefArmyState));
+		// console.log('Attacker army end of battle state : ');
+		// console.log(JSON.stringify(endOfBattleAttArmyState));
+		// console.log('Defender army end of battle state : ');
+		// console.log(JSON.stringify(endOfBattleDefArmyState));
 	};
 
 	function declareWinner(){
