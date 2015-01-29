@@ -52,14 +52,14 @@ window.onload = function(){ // Wait for DOM to load
 	function setUpBattle(){
 		 var formData = formSerialize(document.getElementById("globalvars"));
 	   
-		this.numOfRounds = formData['numOfRounds'];//8;
+		this.numOfRounds = parseInt(formData['numOfRounds']);//8;
 		this.roundCount = 1;
-		this.fatalityPercent = formData['fatalityPercent'];//13;
-		this.accuracy = formData['accuracy'];//1;
-		this.attBoostAtt = formData['attBoostAtt'];
-		this.attBoostDef = formData['attBoostDef'];
-		this.defBoostAtt = formData['defBoostAtt'];
-		this.defBoostDef = formData['defBoostDef'];
+		this.fatalityPercent = parseInt(formData['fatalityPercent']);//13;
+		this.accuracy = parseInt(formData['accuracy']);//1;
+		this.attBoostAtt = parseInt(formData['attBoostAtt']);
+		this.attBoostDef = parseInt(formData['attBoostDef']);
+		this.defBoostAtt = parseInt(formData['defBoostAtt']);
+		this.defBoostDef = parseInt(formData['defBoostDef']);
 		this.numOfTier = 3;
 		var troop1 = formData['troop1'];
 		var troop2 = formData['troop2'];
@@ -273,16 +273,6 @@ window.onload = function(){ // Wait for DOM to load
 		var defLoses = null;
 		var attLoses = null;
 		var minAtt = calcMinAtt(attTroopForThisRound,defTroopForThisRound); //
-		//min attack can be smaller equal or bigger than the attacker troop size
-
-		//Scenario 1: the attacker army dosent need to use all it's troops yet he has more than the defender.
-		// if((minAtt < attTroopForThisRound.quantity) && (minAtt > defTroopForThisRound.quantity){
-
-		// }
-
-		// if((minAtt === attTroopForThisRound.quantity) && (attTroopForThisRound.quantity === defTroopForThisRound.quantity){
-
-		// }
 
 		if(minAtt === attTroopForThisRound.quantity){ //Means attacker army need to use all the troop devision
 			defLoses = calcDefenderLosses(attTroopForThisRound, defTroopForThisRound);  
@@ -329,10 +319,6 @@ window.onload = function(){ // Wait for DOM to load
 		else{
 			return true;
 		}
-	};
-
-	function excecuteRound2(attTroopForThisRound, defTroopForThisRound, attArmyCalc, defArmyCalc, attArmyCopy, defArmyCopy, splittedAttArmy){
-
 	};
 
 	// ----------------------------------------- Flow Supporting Utils ---------------------------------------------
@@ -410,7 +396,7 @@ window.onload = function(){ // Wait for DOM to load
 		}
 
 		numOfAttTroopToKillAllDefTroop = (defTroopForThisRound.quantity * defTroopForThisRound.quantity * defResilience) / 
-		      (attTroopForThisRound.quantity * acr * troopsRps[defTroopForThisRound.troop][attTroopForThisRound.troop + 'Att'] /* fatalityPercent*/ * ((fatalityPercent/numOfRounds)/100));
+		      (attTroopForThisRound.quantity * acr * troopsRps[defTroopForThisRound.troop][attTroopForThisRound.troop + 'Att'] * ((fatalityPercent/numOfRounds)/100));
 
 		if((attTroopForThisRound.quantity - numOfAttTroopToKillAllDefTroop) > 0){ //Meaning the attacker troop has enought troops to kill all defender troop
 			return numOfAttTroopToKillAllDefTroop;
