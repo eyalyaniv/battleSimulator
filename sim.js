@@ -17,9 +17,10 @@ window.onload = function(){ // Wait for DOM to load
 	// };
 
 	document.getElementById('goToBattle').onclick = function(e){
-     	setUpBattle();
+     	setUpMatch();
 	};
 
+	//Serialize the form text inputs into an object.
 	function formSerialize(form){
 		if (!form || form.nodeName !== "FORM") {
 			return;
@@ -45,15 +46,15 @@ window.onload = function(){ // Wait for DOM to load
 	
 	// --------------------------------- Start Flow Conditions--------------------------------------
 
-	(function main(){
+	// (function main(){
 
-	})();
+	// })();
 
-	function setUpBattle(){
+	function setUpMatch(){
 		 var formData = formSerialize(document.getElementById("globalvars"));
 	   
 		this.numOfRounds = parseInt(formData['numOfRounds']);//8;
-		this.roundCount = 1;
+		this.battleCount = 1;
 		this.fatalityPercent = parseInt(formData['fatalityPercent']);//13;
 		this.accuracy = parseInt(formData['accuracy']);//1;
 		this.attBoostAtt = parseInt(formData['attBoostAtt']);
@@ -70,9 +71,6 @@ window.onload = function(){ // Wait for DOM to load
 		this.troopsTypes = [troop1, troop2, troop3, troop4, troop5];
 		this.tiers = ['t1', 't2', 't3', 't4', 't5'];
 
-		//Average Might	T1	T2	T3	T4
-		//Troops	   2.25	4.5	8.5	17
-		//Seals	        3	 6	12	24
 		this.avgMight = {"t1": 2.25, "t2": 4.5, "t3": 8.5, "t4": 17, "t5": 1};
 
 		this.mightCoef = {'infantry' : {'t1' : parseInt(formData['mightCoInfantryT1']), 't2' : parseInt(formData['mightCoInfantryT2']), 't3' : parseInt(formData['mightCoInfantryT3']), 't4' : parseInt(formData['mightCoInfantryT4']), 't5' : parseInt(formData['mightCoInfantryT5'])},
@@ -81,11 +79,7 @@ window.onload = function(){ // Wait for DOM to load
 					    'mage' : {'t1' : parseInt(formData['mightCoMageT1']), 't2' : parseInt(formData['mightCoMageT2']), 't3' : parseInt(formData['mightCoMageT3']), 't4' : parseInt(formData['mightCoMageT4']), 't5' : parseInt(formData['mightCoMageT5'])},
 					    'seals' : {'t1' : parseInt(formData['mightCoSealsT1']), 't2' : parseInt(formData['mightCoSealsT2']), 't3' : parseInt(formData['mightCoSealsT3']), 't4' : parseInt(formData['mightCoSealsT4']), 't5' : parseInt(formData['mightCoSealsT5'])}};
 
-		
-			//mage -> infantry 3/2,   2/3
-			//mage -> seals 2, 0.5
 
-			//seals -> ?
 		this.troopsRps = 	
 		  { 'infantry': 
 		    { "infantryAtt" : parseFloat(formData['inf_infantryAtt'])
@@ -175,14 +169,15 @@ window.onload = function(){ // Wait for DOM to load
 		// 			   	'mage' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
 		// 			    'seals' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0}};
 			
-		this.armyStatePerRound = [[attArmy, defArmy]];
+		this.armyStatePerBattle = [[attArmy, defArmy]];
 		this.battleLog = {};
-		this.endOfBattleAttArmyState = JSON.parse(JSON.stringify(attArmy));
-		this.endOfBattleDefArmyState = JSON.parse(JSON.stringify(defArmy));
+		this.endOfRoundAttArmyState = JSON.parse(JSON.stringify(attArmy));
+		this.endOfRoundDefArmyState = JSON.parse(JSON.stringify(defArmy));
 		this.attTroppsLost = {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0};
 		this.defTroopsLost = {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0};
 
-		setUpRound();
+		startMatch();
+
 	};
 
 	function initArmy(army){
@@ -198,10 +193,16 @@ window.onload = function(){ // Wait for DOM to load
 
 	// ----------------------------------------- Main Flow ---------------------------------------------
 
-	// 1. Find the weakest attacker troop and the weakest defender troop
-	// 2. Decide if to split the attacker army
-	//		- If both troops are equal no need to split and can reach the max number of rounds
-	//		- If 
+	function startMatch(){
+		// There are "numOfRounds" in a Match. Each round has a few battles (num of attack troops X Num of defender troops).
+		console.clear();
+		var k = 0;
+		for(k = 0; k < numOfRounds; k++){
+
+			console.log(' >>>>>>>>>>>>>>>>>>>>> ROUND ' + (k + 1) + ' <<<<<<<<<<<<<<<<<<<<<');
+			setUpRound();
+		}
+	};
 
 	function setUpRound(){
 
@@ -217,31 +218,35 @@ window.onload = function(){ // Wait for DOM to load
 		var defArmyCalc = {};
 		var lastSplittedAttArmy = {};
 		var split = true;
+		var MaxNumOfBattlesInRound = 0;
+
+		//Each round has few battles and the max number of battles are numAttTroops X numDefTroops.
+		MaxNumOfBattlesInRound = calcMaxNumOfBattlesInRound(attArmy, defArmy);
 		
-		for(k = 0; k < numOfRounds; k++){
+		for(k = 0; k < MaxNumOfBattlesInRound; k++){
 
-			attArmyCopy=JSON.parse(JSON.stringify(armyStatePerRound[k][0]));
-			defArmyCopy=JSON.parse(JSON.stringify(armyStatePerRound[k][1]));
+			attArmyCopy=JSON.parse(JSON.stringify(armyStatePerBattle[k][0]));
+			defArmyCopy=JSON.parse(JSON.stringify(armyStatePerBattle[k][1]));
 
-			attArmyCalc=JSON.parse(JSON.stringify(armyStatePerRound[k][0]));
-			defArmyCalc=JSON.parse(JSON.stringify(armyStatePerRound[k][1]));
+			attArmyCalc=JSON.parse(JSON.stringify(armyStatePerBattle[k][0]));
+			defArmyCalc=JSON.parse(JSON.stringify(armyStatePerBattle[k][1]));
 
 			if(calcArmySum(defArmyCalc) === 0){
-				console.log(' >>>>>>>>>>>>>>>>>>>>> BATTLE IS OVER <<<<<<<<<<<<<<<<<<<<<');
+				console.log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
 				//console.log('Battle is over - Defender lost the battle');
 				produceBattleReport();
 				declareWinner();
 				return;
 			}
 			if(calcArmySum(attArmyCalc) === 0){
-				console.log(' >>>>>>>>>>>>>>>>>>>>> BATTLE IS OVER <<<<<<<<<<<<<<<<<<<<<');
+				console.log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
 				//console.log('Battle is over - Attacker lost the battle');
 				produceBattleReport();
 				declareWinner();
 				return;
 			}
 
-			console.log(' >>>>>>>>>>>>>>>>>>>>> ROUND ' + (k + 1) + ' <<<<<<<<<<<<<<<<<<<<<');
+			console.log(' >>>>>>>>>>>>>>>>>>>>> Battle ' + (k + 1) + ' <<<<<<<<<<<<<<<<<<<<<');
 
 			defTroopForThisRound = findWeakestTroop(defArmyCalc); 
 			attTroopForThisRound = findWeakestTroop(attArmyCalc);
@@ -262,14 +267,14 @@ window.onload = function(){ // Wait for DOM to load
 			//console.log('Defending troop ratio is: ' + defTroopRatio);
 			//console.log('Attaking troop for this round is: ' + attTroopForThisRound.quantity + ' ' + attTroopForThisRound.tier + ' ' + attTroopForThisRound.troop);
 
-			split = executeRound(attTroopForThisRound, defTroopForThisRound, attArmyCalc, defArmyCalc, attArmyCopy, defArmyCopy, splittedAttArmy);	
+			split = executeBattle(attTroopForThisRound, defTroopForThisRound, attArmyCalc, defArmyCalc, attArmyCopy, defArmyCopy, splittedAttArmy);	
 		}
-		console.log(' >>>>>>>>>>>>>>>>>>>>> BATTLE IS OVER <<<<<<<<<<<<<<<<<<<<<');
+		console.log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
 		produceBattleReport();
 		declareWinner();
 	};
 
-	function executeRound(attTroopForThisRound, defTroopForThisRound, attArmyCalc, defArmyCalc, attArmyCopy, defArmyCopy, splittedAttArmy){
+	function executeBattle(attTroopForThisRound, defTroopForThisRound, attArmyCalc, defArmyCalc, attArmyCopy, defArmyCopy, splittedAttArmy){
 		var defLoses = null;
 		var attLoses = null;
 		var minAtt = calcMinAtt(attTroopForThisRound,defTroopForThisRound); //
@@ -298,19 +303,19 @@ window.onload = function(){ // Wait for DOM to load
 			defArmyCopy[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defTroopForThisRound.quantity;
 		}
 		
-		console.log('Attaking troop for this round is: ' + minAtt + ' ' + attTroopForThisRound.tier + ' ' + attTroopForThisRound.troop);
+		console.log('Attaking troop for this battle is: ' + minAtt + ' ' + attTroopForThisRound.tier + ' ' + attTroopForThisRound.troop);
 
-		armyStatePerRound[roundCount] = [attArmyCopy, defArmyCopy];
-		battleLog[roundCount-1] = {'attTroop': attTroopForThisRound, 'attTroopLosses' : attLoses, 'defTroop': defTroopForThisRound, 'defTroopLosses': defLoses};
-		endOfBattleAttArmyState[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attLoses;
+		armyStatePerBattle[battleCount] = [attArmyCopy, defArmyCopy];
+		battleLog[battleCount-1] = {'attTroop': attTroopForThisRound, 'attTroopLosses' : attLoses, 'defTroop': defTroopForThisRound, 'defTroopLosses': defLoses};
+		endOfRoundAttArmyState[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attLoses;
 		attTroppsLost[attTroopForThisRound.tier] += attLoses;
-		endOfBattleDefArmyState[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defLoses;
+		endOfRoundDefArmyState[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defLoses;
 		defTroopsLost[defTroopForThisRound.tier] += defLoses;
 
-		console.log('Round result:');
+		console.log('battle result:');
 		console.log('Defender troop lost: ' + defLoses);	
 		console.log('Attacker troop lost: ' + attLoses);	 
-		roundCount++;
+		battleCount++;
 
 		if(defLoses < defTroopForThisRound.quantity){
 				splittedAttArmy[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attTroopForThisRound.quantity;
@@ -362,6 +367,50 @@ window.onload = function(){ // Wait for DOM to load
 		return defTroopForThisRound.quantity / calcArmySum(defArmy);
 	};
 
+	function calcMaxNumOfBattlesInRound(attArmy, defArmy){
+		
+		var i = 0;
+		var attArmyNumOfTroops = 0;
+		var defArmyNumOfTroops = 0;
+
+		for(i = 0; i < troopsTypes.length; i++){
+
+			if(attArmy[troopsTypes[i]].t1 > 0){
+				attArmyNumOfTroops++;
+			}
+			if(attArmy[troopsTypes[i]].t2 > 0){
+				attArmyNumOfTroops++;
+			}
+			if(attArmy[troopsTypes[i]].t3 > 0){
+				attArmyNumOfTroops++;
+			}
+			if(attArmy[troopsTypes[i]].t4 > 0){
+				attArmyNumOfTroops++;
+			}
+			if(attArmy[troopsTypes[i]].t5 > 0){
+				attArmyNumOfTroops++;
+			}
+
+			if(defArmy[troopsTypes[i]].t1 > 0){
+				defArmyNumOfTroops++;
+			}
+			if(defArmy[troopsTypes[i]].t2 > 0){
+				defArmyNumOfTroops++;
+			}
+			if(defArmy[troopsTypes[i]].t3 > 0){
+				defArmyNumOfTroops++;
+			}
+			if(defArmy[troopsTypes[i]].t4 > 0){
+				defArmyNumOfTroops++;
+			}
+			if(defArmy[troopsTypes[i]].t5 > 0){
+				defArmyNumOfTroops++;
+			}
+		}
+
+		return defArmyNumOfTroops*attArmyNumOfTroops;
+	};
+
 	function calcArmySum(army){
 		
 		var i = 0;
@@ -370,33 +419,31 @@ window.onload = function(){ // Wait for DOM to load
 		for(i = 0; i < troopsTypes.length; i++){
 
 			//TODO: make the tier automatic
-			armySum += (army[troopsTypes[i]].t1 + army[troopsTypes[i]].t2 + army[troopsTypes[i]].t3);
+			armySum += (army[troopsTypes[i]].t1 + army[troopsTypes[i]].t2 + army[troopsTypes[i]].t3 + + army[troopsTypes[i]].t4 + + army[troopsTypes[i]].t5);
 		}
 
 		return armySum;
 	};
 
 	function calcMinAtt(attTroopForThisRound, defTroopForThisRound){
-		var defResilience = 1;
-		var acr = 1;
-		var rps = 1;
-		var numOfAttTroopToKillAllDefTroop = null;
+		
+		var defenderLosses = null;
+		var defResBoost = 0;
+		var intrisincBoost = 1;
 
-		if(defTroopForThisRound.tier === 't2'){
-			defResilience = 2;
-		}
-		if(defTroopForThisRound.tier === 't3'){
-			defResilience = 3;
-		}
-		if(defTroopForThisRound.tier === 't4'){
-			defResilience = 4;
-		}
-		if(defTroopForThisRound.tier === 't5'){
-			defResilience = 5;
-		}
+		var attMight = mightCoef[attTroopForThisRound.troop][attTroopForThisRound.tier];
+		var defMight = mightCoef[defTroopForThisRound.troop][defTroopForThisRound.tier];
 
-		numOfAttTroopToKillAllDefTroop = (defTroopForThisRound.quantity * defTroopForThisRound.quantity * defResilience) / 
-		      (attTroopForThisRound.quantity * acr * troopsRps[defTroopForThisRound.troop][attTroopForThisRound.troop + 'Att'] * ((fatalityPercent/numOfRounds)/100));
+		var Na = attTroopForThisRound.quantity;  //Number of Troops in the Attacker’s side
+		var Acr = accuracy;  //Accuracy of Attacker troop (includes the random factor)
+		var RPSa = troopsRps[defTroopForThisRound.troop][attTroopForThisRound.troop + 'Att']; //Attacker-Type’s RPS Ratio against the Defender Type
+		var Fr = ((fatalityPercent/(numOfRounds*100)));    //fatality ratio per round  <<<< Does fatality ratio changes form round to round? <<<<<<<<
+
+		var attRelStrength = (attMight + attMight * attBoostAtt / intrisincBoost) * RPSa;
+		var res_attToDev = attRelStrength * (100 - Acr) / 100;
+		var res_resilience = defMight + (defMight * defBoostDef + attMight * defResBoost) / intrisincBoost;
+
+		numOfAttTroopToKillAllDefTroop = (defTroopForThisRound.quantity * res_resilience) / (Fr * res_attToDev);
 
 		if((attTroopForThisRound.quantity - numOfAttTroopToKillAllDefTroop) > 0){ //Meaning the attacker troop has enought troops to kill all defender troop
 			return numOfAttTroopToKillAllDefTroop;
@@ -407,92 +454,72 @@ window.onload = function(){ // Wait for DOM to load
 		}
 	};
 
+	//Calculation of attacker KILLS on defender's troop
 	function calcDefenderLosses(attTroopForThisRound, defTroopForThisRound){
-
-		//         Na           Att * RPSa(dc)* boostatt 
-	    //Kills = ---- * Acr * ------------------------  * F * Fr
-	    //         Nd                Rd* boostdef
-	    //  |------1-----|-------2----------|---3----|
-
-	    //Tier		Attack Rating	Defense Rating	Resilience Rating
-		//  1		         1			      1			       1
-	    //  2		         2			      2			       2
-	    //  3		         3			      3			       3
-	    //  4		         4			      4			       4
-
-
-		var defenderLosses = null;
-		var defResilience = 1;
-
-		if(defTroopForThisRound.tier === 't2'){
-			defResilience = 2;
-		}
-		if(defTroopForThisRound.tier === 't3'){
-			defResilience = 3;
-		}
-		if(defTroopForThisRound.tier === 't4'){
-			defResilience = 4;
-		}
-		if(defTroopForThisRound.tier === 't5'){
-			defResilience = 5;
-		}
+		
+	    var defenderLosses = null;
+		var defResBoost = 0;
+		var intrisincBoost = 1;
+		
+		var attMight = mightCoef[attTroopForThisRound.troop][attTroopForThisRound.tier];
+		var defMight = mightCoef[defTroopForThisRound.troop][defTroopForThisRound.tier];
 
 		var Na = attTroopForThisRound.quantity;  //Number of Troops in the Attacker’s side
-		var Nd = defTroopForThisRound.quantity;   //Number of Troops in the Defender’s side
-		var Att = attTroopForThisRound.quantity * attBoostAtt;//Attack net Ratio of Attacker Unit  (after attack boost impacts)
 		var Acr = accuracy;  //Accuracy of Attacker troop (includes the random factor)
 		var RPSa = troopsRps[defTroopForThisRound.troop][attTroopForThisRound.troop + 'Att']; //Attacker-Type’s RPS Ratio against the Defender Type
-		var F = fatalityPercent;    //fatality ratio
 		var Fr = ((fatalityPercent/(numOfRounds*100)));    //fatality ratio per round  <<<< Does fatality ratio changes form round to round? <<<<<<<<
-		var Rd = defResilience * defBoostDef;   //Defender’s Resilience net ratio (after defense and health boosts impacts).
 
-		var temp1 = (Na/Nd)*Acr;
-		var temp2 = (Att*RPSa)/Rd;
+		var attRelStrength = (attMight + attMight * attBoostAtt / intrisincBoost) * RPSa;
+		var res_attToDev = attRelStrength * (100 - Acr) / 100;
+		var res_resilience = defMight + (defMight * defBoostDef + attMight * defResBoost) / intrisincBoost;
 
-		defenderLosses = temp1 * temp2 /* *F */* Fr; 
+		defenderLosses = (Na * Fr * res_attToDev) / res_resilience;
 
 		return defenderLosses;
 	};
 
-	function calcAttackerLosses(attTroopForThisRound,defTroopForThisRound, minAtt){
+	//Calculation of attacker KILLS on defender's troop
+	function calcAttackerLosses(attTroopForThisRound, defTroopForThisRound){
+		
+	    var attackerLosses = null;
+		var defResBoost = 0;
+		var intrisincBoost = 1;
 
-		//          Nd           Def * RPSd(ac) 
-	    //Losses = ---- * Acr * ---------------- * F * Fr
-	    //          Na                Ra
-	    //   |------1-----|-------2----------|---3---|
+		var attMight = mightCoef[attTroopForThisRound.troop][attTroopForThisRound.tier];
+		var defMight = mightCoef[defTroopForThisRound.troop][defTroopForThisRound.tier];
 
-
-		var attackerLosses = null;
-		var attResilience = 1;
-
-		if(attTroopForThisRound.tier === 't2'){
-			attResilience = 2;
-		}
-		if(attTroopForThisRound.tier === 't3'){
-			attResilience = 3;
-		}
-		if(attTroopForThisRound.tier === 't4'){
-			attResilience = 4;
-		}
-		if(attTroopForThisRound.tier === 't5'){
-			attResilience = 5;
-		}
-
-		var Na = minAtt;  //Number of Troops in the Attacker’s side
 		var Nd = defTroopForThisRound.quantity;  //Number of Troops in the Defender’s side
-		var Def = defTroopForThisRound.quantity * defBoostAtt; //Defence net Ratio of Defender’s Unit  (after defence boost impacts)
-		var Acr = accuracy;  //Accuracy of Defender troop (includes the random factor)
+		var Acr = accuracy;  //Accuracy of Attacker troop (includes the random factor)
 		var RPSd = troopsRps[attTroopForThisRound.troop][defTroopForThisRound.troop + 'Def']; //Attacker-Type’s RPS Ratio against the Defender Type
-		var F = fatalityPercent;    //fatality ratio
-		var Fr = ((fatalityPercent/numOfRounds)/100);   //fatality ratio per round 
-		var Ra = attResilience * attBoostDef;   //Attacker’s Resilience net ratio (after defense and health boosts impacts).
+		var Fr = ((fatalityPercent/(numOfRounds*100)));    //fatality ratio per round  <<<< Does fatality ratio changes form round to round? <<<<<<<<
 
-		var temp1 = (Nd/Na)*Acr;
-		var temp2 = (Def*RPSd)/Ra;
+		var defRelStrength = (defMight + defMight * defBoostDef / intrisincBoost) * RPSd;
+		var res_attToDev = defRelStrength * (100 - Acr) / 100;
+		var res_resilience = attMight + (attMight * defBoostDef + attMight * defResBoost) / intrisincBoost;
 
-		attackerLosses = temp1 * temp2 /** F */* Fr; 
+		defenderLosses = Nd * Fr * (res_attToDev) / (res_resilience);
 
 		return attackerLosses;
+	};
+
+	function getTroopTierInNumber(troop){
+
+		tierInNum = 1; //default
+
+		if(troop.tier === 't2'){
+			tierInNum = 2;
+		}
+		if(troop.tier === 't3'){
+			tierInNum = 3;
+		}
+		if(troop.tier === 't4'){
+			tierInNum = 4;
+		}
+		if(troop.tier === 't5'){
+			tierInNum = 5;
+		}
+
+		return tierInNum;
 	};
 	
 	function calcMight(troopLost){
@@ -508,9 +535,9 @@ window.onload = function(){ // Wait for DOM to load
 
 	function produceBattleReport(){
 		// console.log('Attacker army end of battle state : ');
-		// console.log(JSON.stringify(endOfBattleAttArmyState));
+		// console.log(JSON.stringify(endOfWarAttArmyState));
 		// console.log('Defender army end of battle state : ');
-		// console.log(JSON.stringify(endOfBattleDefArmyState));
+		// console.log(JSON.stringify(endOfWarDefArmyState));
 	};
 
 	function declareWinner(){
