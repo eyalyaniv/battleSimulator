@@ -172,12 +172,15 @@ window.onload = function(){ // Wait for DOM to load
 
 
 		// 1 MATCH --> UP TO 8 ROUNDS --> UP TO (numOfAttTroop X numOfDefTroop) BATTLES
+		this.defArmyForNextRoundOrAttTypeChange = JSON.parse(JSON.stringify(defArmy));
+		this.defArmyForNextBattle = JSON.parse(JSON.stringify(defArmy));
+		this.attArmyForNextRound = JSON.parse(JSON.stringify(attArmy));
+		this.attArmyForNextBattle = JSON.parse(JSON.stringify(attArmy));
+
 
 
 		this.armyStatePerRound = [[attArmy, defArmy]]; //Updated at the end of each rounds
 		this.armyStatePerBattle = [[attArmy, defArmy]];
-		
-
 		this.battleLog = {};
 		this.endOfRoundAttArmyState = JSON.parse(JSON.stringify(attArmy));
 		this.endOfRoundDefArmyState = JSON.parse(JSON.stringify(defArmy));
@@ -212,17 +215,23 @@ window.onload = function(){ // Wait for DOM to load
 		var roundCount = 1;
 		for(k = 0; k < numOfRounds; k++){
 
-			attArmyCopy=JSON.parse(JSON.stringify(armyStatePerRound[k][0]));
-			defArmyCopy=JSON.parse(JSON.stringify(armyStatePerRound[k][1]));
+			//attArmyCopy=JSON.parse(JSON.stringify(armyStatePerRound[k][0]));
+			//defArmyCopy=JSON.parse(JSON.stringify(armyStatePerRound[k][1]));
 
-			attArmyCalc=JSON.parse(JSON.stringify(armyStatePerRound[k][0]));
-			defArmyCalc=JSON.parse(JSON.stringify(armyStatePerRound[k][1]));
+			//attArmyCalc=JSON.parse(JSON.stringify(armyStatePerRound[k][0]));
+			//defArmyCalc=JSON.parse(JSON.stringify(armyStatePerRound[k][1]));
+
+			if(calcArmySum(attArmyForNextRound) === 0 || calcArmySum(defArmyForNextRoundOrAttTypeChange) === 0){
+				console.log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
+	
+				return;
+			}
 
 			console.log(' >>>>>>>>>>>>>>>>>>>>> ROUND ' + (k + 1) + ' <<<<<<<<<<<<<<<<<<<<<');
 			setUpRound();
 
 			//Need to update post round army state
-			armyStatePerRound[roundCount] = [armyStatePerBattle[armyStatePerRound.length][0], armyStatePerBattle[armyStatePerRound.length][1]];
+			//armyStatePerRound[roundCount] = [armyStatePerBattle[armyStatePerRound.length][0], armyStatePerBattle[armyStatePerRound.length][1]];
 
 			roundCount++;
 		}
@@ -250,32 +259,35 @@ window.onload = function(){ // Wait for DOM to load
 		for(k = 0; k < MaxNumOfBattlesInRound; k++){
 
 			if(k === 0){ //If it is the first battle in a round take the army states from prev round
-				var defArmyInnerTemp = JSON.parse(JSON.stringify(armyStatePerRound[armyStatePerRound.length-1][1]));
-				var attArmyInnerTemp = JSON.parse(JSON.stringify(armyStatePerRound[armyStatePerRound.length-1][0]));
+				var defArmyInnerTemp = JSON.parse(JSON.stringify(defArmyForNextRoundOrAttTypeChange));
+				var attArmyInnerTemp = JSON.parse(JSON.stringify(attArmyForNextRound));
+				defArmyForNextBattle = JSON.parse(JSON.stringify(defArmyForNextRoundOrAttTypeChange));
+				attArmyForNextBattle = JSON.parse(JSON.stringify(attArmyForNextRound));
 			}
 			else{ // If it is the second or obove battle in a round take army state from the last battle
-				var defArmyInnerTemp = JSON.parse(JSON.stringify(armyStatePerBattle[armyStatePerBattle.length-1][1]));
-				var attArmyInnerTemp = JSON.parse(JSON.stringify(armyStatePerBattle[armyStatePerBattle.length-1][0]));
-			}
-			
+				var defArmyInnerTemp = JSON.parse(JSON.stringify(defArmyForNextBattle));
+				var attArmyInnerTemp = JSON.parse(JSON.stringify(attArmyForNextBattle));
 
-			if(calcArmySum(defArmyInnerTemp) === 0){
-				console.log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
-			
-				return;
+				var defArmyForAttTypeChange = JSON.parse(JSON.stringify(defArmyForNextRoundOrAttTypeChange));
+				if(calcArmySum(defArmyInnerTemp) === 0 && calcArmySum(defArmyForAttTypeChange) !== 0){
+					defArmyInnerTemp = defArmyForAttTypeChange;
+					defArmyForNextBattle = defArmyForAttTypeChange;
+		    	}
 			}
-			if(calcArmySum(attArmyInnerTemp) === 0){
-				console.log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
+		    //if(calcArmySum(defArmyInnerTemp) === 0 && ){
+			// 	console.log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
+			
+			// 	return;
+		    //}
+			// if(calcArmySum(attArmyInnerTemp) === 0){
+			// 	console.log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
 	
-				return;
-			}
-
+			// 	return;
+			// }
 			console.log(' >>>>>>>>>>>>>>>>>>>>> Battle ' + (k + 1) + ' <<<<<<<<<<<<<<<<<<<<<');
 
 			defTroopForThisRound = findWeakestTroop(defArmyInnerTemp); 
 			attTroopForThisRound = findWeakestTroop(attArmyInnerTemp);
-
-			// ***************************   EXPERIMENTAL ***************************************
 
 			defTroopRatio = calcWeakestDefTroopRatio(defTroopForThisRound, defArmyInnerTemp);
 
@@ -284,30 +296,7 @@ window.onload = function(){ // Wait for DOM to load
 				splittedAttArmy = splitAttArmy(attArmyBeforeSplitCalc, defTroopRatio);
 				attTroopForThisRound = findWeakestTroop(splittedAttArmy);
 			}
-			// else{
-			// 	splittedAttArmy = attArmyInnerTemp;
-			// }
-
-			// ***********************************************************************************
-			// if(split /*&& (attTroopForThisRound.quantity >= defTroopForThisRound.quantity)*/){
-			// 	defTroopRatio = calcWeakestDefTroopRatio(defTroopForThisRound, defArmyCalc);
-			// 	splittedAttArmy = splitAttArmy(attArmyCalc, defTroopRatio);
-			// 	//lastSplittedAttArmy=JSON.parse(JSON.stringify(splittedAttArmy));
-				
-			// }
-			// else{
-			// 	splittedAttArmy = attArmyCalc;
-			// 	//attTroopForThisRound = findWeakestTroop(lastSplittedAttArmy);
-			// }
-
-
-			
-			
-
-			console.log('Defending troop for this round is: ' + defTroopForThisRound.quantity + ' ' + defTroopForThisRound.tier + ' ' + defTroopForThisRound.troop);
-			//console.log('Defending troop ratio is: ' + defTroopRatio);
-			//console.log('Attaking troop for this round is: ' + attTroopForThisRound.quantity + ' ' + attTroopForThisRound.tier + ' ' + attTroopForThisRound.troop);
-
+	
 			executeBattle(attTroopForThisRound, defTroopForThisRound, splittedAttArmy, defTroopRatio, defArmyInnerTemp, attArmyInnerTemp);	
 		}
 	};
@@ -315,70 +304,60 @@ window.onload = function(){ // Wait for DOM to load
 	function executeBattle(attTroopForThisRound, defTroopForThisRound, splittedAttArmy, defTroopRatio, defArmyCopy, attArmyCopy){
 		var defLoses = null;
 		var attLoses = null;
-		var minAtt = calcMinAtt(attTroopForThisRound,defTroopForThisRound); //
+		var minAtt = calcMinAtt(attTroopForThisRound,defTroopForThisRound); 
 
+		attTroopForThisRound.quantity = minAtt;
 
-		// ***************************   EXPERIMENTAL ***************************************
-		attLoses = calcAttackerLosses(attTroopForThisRound,defTroopForThisRound);
-		defLoses = calcDefenderLosses(attTroopForThisRound, defTroopForThisRound);
+		attLoses = Math.ceil(calcAttackerLosses(attTroopForThisRound,defTroopForThisRound));
+		defLoses = Math.ceil(calcDefenderLosses(attTroopForThisRound, defTroopForThisRound));
 
-		defArmyCopy[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defLoses;
-
-		if(minAtt <= attTroopForThisRound.quantity && defTroopRatio < 1){ //Means there was a split and that the attacker can use smaller troop in order to kill all the defender troop.
-			attArmyCopy[attTroopForThisRound.troop][attTroopForThisRound.tier] -= minAtt;
-		}
-		else{
-			attArmyCopy[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attLoses;
-		}
-
-		// *********************************************************************************
-
-
-		// if(minAtt === attTroopForThisRound.quantity){ //Means attacker army need to use all the troop devision
-		// 	defLoses = calcDefenderLosses(attTroopForThisRound, defTroopForThisRound);  
-			
-		// 	attLoses = calcAttackerLosses(attTroopForThisRound,defTroopForThisRound);
-
-		// 	//Update the state of attacker army for next round
-		// 	attArmyCopy[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attTroopForThisRound.quantity;
-
-		// 	//Update the state of defender army for next round
-		// 	defArmyCopy[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defLoses;
-		// }
-		// else{ //Meaning attacker troop can use less troops
-		// 	//console.log('The min att needed to kill all is : ' + minAtt);
-		// 	//The attacker killed all the defender's troops for this round. Need to caculate attacker loses
-		// 	attLoses = calcAttackerLosses(attTroopForThisRound,defTroopForThisRound);
-		// 	defLoses = defTroopForThisRound.quantity;
-			
-		// 	//Update the state of attacker army for next round
-		// 	attArmyCopy[attTroopForThisRound.troop][attTroopForThisRound.tier] -= minAtt;
-
-		// 	//Update the state of defender army for next round
-		// 	defArmyCopy[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defTroopForThisRound.quantity;
-		// }
-		
 		console.log('Attaking troop for this battle is: ' + minAtt + ' ' + attTroopForThisRound.tier + ' ' + attTroopForThisRound.troop);
-
-		armyStatePerBattle[battleCount] = [attArmyCopy, defArmyCopy];
-		battleLog[battleCount-1] = {'attTroop': attTroopForThisRound, 'attTroopLosses' : attLoses, 'defTroop': defTroopForThisRound, 'defTroopLosses': defLoses};
-		endOfRoundAttArmyState[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attLoses;
-		attTroppsLost[attTroopForThisRound.tier] += attLoses;
-		endOfRoundDefArmyState[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defLoses;
-		defTroopsLost[defTroopForThisRound.tier] += defLoses;
-
+		console.log('Defending troop for this round is: ' + defTroopForThisRound.quantity + ' ' + defTroopForThisRound.tier + ' ' + defTroopForThisRound.troop);
 		console.log('battle result:');
 		console.log('Defender troop lost: ' + defLoses);	
-		console.log('Attacker troop lost: ' + attLoses);	 
-		battleCount++;
+		console.log('Attacker troop lost: ' + attLoses);
 
-		if(defLoses < defTroopForThisRound.quantity){
-				//splittedAttArmy[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attTroopForThisRound.quantity;
-				return false;
+		defArmyForNextRoundOrAttTypeChange[defTroopForThisRound.troop][defTroopForThisRound.tier] = defTroopForThisRound.quantity - defLoses;
+		defArmyForNextBattle[defTroopForThisRound.troop][defTroopForThisRound.tier] = 0;
+
+		attArmyForNextRound[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attLoses;
+		if(defTroopRatio < 1){
+			attArmyForNextBattle[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attTroopForThisRound.quantity;
 		}
 		else{
-			return true;
+			attArmyForNextBattle[attTroopForThisRound.troop][attTroopForThisRound.tier] = 0;
 		}
+
+		battleLog[battleCount-1] = {'attTroop': attTroopForThisRound, 'attTroopLosses' : attLoses, 'defTroop': defTroopForThisRound, 'defTroopLosses': defLoses};
+		
+		battleCount++;
+
+		//defArmyCopy[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defLoses;
+
+		//if(minAtt <= attTroopForThisRound.quantity && defTroopRatio < 1){ //Means there was a split and that the attacker can use smaller troop in order to kill all the defender troop.
+			//attArmyCopy[attTroopForThisRound.troop][attTroopForThisRound.tier] -= minAtt;
+		//}
+		//else{
+			//attArmyCopy[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attLoses;
+		//}
+		
+
+		//armyStatePerBattle[battleCount] = [attArmyCopy, defArmyCopy];
+		//endOfRoundAttArmyState[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attLoses;
+		//attTroppsLost[attTroopForThisRound.tier] += attLoses;
+		//endOfRoundDefArmyState[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defLoses;
+		//defTroopsLost[defTroopForThisRound.tier] += defLoses;
+
+			 
+		
+
+		//if(defLoses < defTroopForThisRound.quantity){
+				//splittedAttArmy[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attTroopForThisRound.quantity;
+				//return false;
+		//}
+		//else{
+			//return true;
+		//}
 	};
 
 	// ----------------------------------------- Flow Supporting Utils ---------------------------------------------
@@ -589,10 +568,10 @@ window.onload = function(){ // Wait for DOM to load
 	};
 
 	function produceBattleReport(){
-		console.log('Attacker army end of battle state : ');
-		console.log(JSON.stringify(endOfWarAttArmyState));
-		console.log('Defender army end of battle state : ');
-		console.log(JSON.stringify(endOfWarDefArmyState));
+		// console.log('Attacker army end of battle state : ');
+		// console.log(JSON.stringify(endOfWarAttArmyState));
+		// console.log('Defender army end of battle state : ');
+		// console.log(JSON.stringify(endOfWarDefArmyState));
 	};
 
 	function declareWinner(){
