@@ -8,6 +8,7 @@ window.onload = function(){ // Wait for DOM to load
 	    
 	//     console.log = function (message) {
 	//     	var logger = document.getElementById('log');
+	//     	logger.innerHTML = '';
 	//         if (typeof message == 'object') {
 	//             logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : String(message)) + '<br />';
 	//         } else {
@@ -179,11 +180,11 @@ window.onload = function(){ // Wait for DOM to load
 
 
 
-		this.armyStatePerRound = [[attArmy, defArmy]]; //Updated at the end of each rounds
-		this.armyStatePerBattle = [[attArmy, defArmy]];
+		//this.armyStatePerRound = [[attArmy, defArmy]]; //Updated at the end of each rounds
+		//this.armyStatePerBattle = [[attArmy, defArmy]];
 		this.battleLog = {};
-		this.endOfRoundAttArmyState = JSON.parse(JSON.stringify(attArmy));
-		this.endOfRoundDefArmyState = JSON.parse(JSON.stringify(defArmy));
+		//this.endOfRoundAttArmyState = JSON.parse(JSON.stringify(attArmy));
+		//this.endOfRoundDefArmyState = JSON.parse(JSON.stringify(defArmy));
 
 		this.attTroppsLost = {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0};
 		this.defTroopsLost = {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0};
@@ -207,6 +208,8 @@ window.onload = function(){ // Wait for DOM to load
 	function startMatch(){
 		// There are "numOfRounds" in a Match. Each round has a few battles (num of attack troops X Num of defender troops).
 		console.clear();
+
+
 		var k = 0;
 		var attArmyCopy = {};
 		var defArmyCopy = {};
@@ -329,7 +332,9 @@ window.onload = function(){ // Wait for DOM to load
 		}
 
 		battleLog[battleCount-1] = {'attTroop': attTroopForThisRound, 'attTroopLosses' : attLoses, 'defTroop': defTroopForThisRound, 'defTroopLosses': defLoses};
-		
+		attTroppsLost[attTroopForThisRound.tier] += attLoses;
+		defTroopsLost[defTroopForThisRound.tier] += defLoses;
+
 		battleCount++;
 
 		//defArmyCopy[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defLoses;
@@ -344,9 +349,7 @@ window.onload = function(){ // Wait for DOM to load
 
 		//armyStatePerBattle[battleCount] = [attArmyCopy, defArmyCopy];
 		//endOfRoundAttArmyState[attTroopForThisRound.troop][attTroopForThisRound.tier] -= attLoses;
-		//attTroppsLost[attTroopForThisRound.tier] += attLoses;
 		//endOfRoundDefArmyState[defTroopForThisRound.troop][defTroopForThisRound.tier] -= defLoses;
-		//defTroopsLost[defTroopForThisRound.tier] += defLoses;
 
 			 
 		
