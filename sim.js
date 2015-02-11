@@ -241,6 +241,8 @@ window.onload = function(){ // Wait for DOM to load
 			if(calcArmySum(attArmyForNextRound) === 0 || calcArmySum(defArmyForNextRoundOrAttTypeChange) === 0){
 				console.log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
 				log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
+				produceBattleReport();
+				declareWinner();
 				return;
 			}
 
@@ -655,10 +657,10 @@ window.onload = function(){ // Wait for DOM to load
 		log('Attacker lost tier 3: ' + attTroppsLost['t3']);
 		log('Attacker lost tier 4: ' + attTroppsLost['t4']);
 		log('Defender might lost =  ' + defMightLost);
-		log('Attacker lost tier 1: ' + defTroopsLost['t1']);
-		log('Attacker lost tier 2: ' + defTroopsLost['t2']);
-		log('Attacker lost tier 3: ' + defTroopsLost['t3']);
-		log('Attacker lost tier 4: ' + defTroopsLost['t4']);
+		log('Defender lost tier 1: ' + defTroopsLost['t1']);
+		log('Defender lost tier 2: ' + defTroopsLost['t2']);
+		log('Defender lost tier 3: ' + defTroopsLost['t3']);
+		log('Defender lost tier 4: ' + defTroopsLost['t4']);
 	};
 
 	function makeJSON(){
