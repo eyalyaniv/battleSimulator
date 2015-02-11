@@ -5,3 +5,13 @@ html {
   -o-background-size: cover;
   background-size: cover;
 }
+
+#goToBattle{
+	background: red;
+	width: 200px;
+	height: 30px;
+}
+/*#globalVars{
+	background: black;
+opacity: 0.3;
+}*/

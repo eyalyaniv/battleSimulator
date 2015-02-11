@@ -19,6 +19,7 @@ window.onload = function(){ // Wait for DOM to load
 
 	document.getElementById('goToBattle').onclick = function(e){
      	setUpMatch();
+     	Logger.show();
 	};
 
 	//Serialize the form text inputs into an object.
@@ -177,9 +178,7 @@ window.onload = function(){ // Wait for DOM to load
 		this.defArmyForNextBattle = JSON.parse(JSON.stringify(defArmy));
 		this.attArmyForNextRound = JSON.parse(JSON.stringify(attArmy));
 		this.attArmyForNextBattle = JSON.parse(JSON.stringify(attArmy));
-
-
-
+	
 		//this.armyStatePerRound = [[attArmy, defArmy]]; //Updated at the end of each rounds
 		//this.armyStatePerBattle = [[attArmy, defArmy]];
 		this.battleLog = {};
@@ -187,7 +186,22 @@ window.onload = function(){ // Wait for DOM to load
 		//this.endOfRoundDefArmyState = JSON.parse(JSON.stringify(defArmy));
 
 		this.attTroppsLost = {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0};
+
+		this.attArmyLosses = {'infantry' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		 			   	'archers' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		 			   	'cavalry' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		 			    'mage' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		 			    'seals' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0}};
+
+
 		this.defTroopsLost = {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0};
+
+		this.defArmykills = {'infantry' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		 			   	'archers' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		 			   	'cavalry' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		 			    'mage' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0},
+		 			    'seals' : {'t1' : 0, 't2' : 0, 't3' : 0, 't4' : 0, 't5' : 0}};
+
 
 		startMatch();
 	};
@@ -207,8 +221,8 @@ window.onload = function(){ // Wait for DOM to load
 
 	function startMatch(){
 		// There are "numOfRounds" in a Match. Each round has a few battles (num of attack troops X Num of defender troops).
-		console.clear();
-
+		//console.clear();
+		Logger.clear();
 
 		var k = 0;
 		var attArmyCopy = {};
@@ -226,11 +240,12 @@ window.onload = function(){ // Wait for DOM to load
 
 			if(calcArmySum(attArmyForNextRound) === 0 || calcArmySum(defArmyForNextRoundOrAttTypeChange) === 0){
 				console.log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
-	
+				log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
 				return;
 			}
 
 			console.log(' >>>>>>>>>>>>>>>>>>>>> ROUND ' + (k + 1) + ' <<<<<<<<<<<<<<<<<<<<<');
+			log(' >>>>>>>>>>>>>>>>>>>>> ROUND ' + (k + 1) + ' <<<<<<<<<<<<<<<<<<<<<');
 			setUpRound();
 
 			//Need to update post round army state
@@ -239,6 +254,7 @@ window.onload = function(){ // Wait for DOM to load
 			roundCount++;
 		}
 		console.log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
+		log(' >>>>>>>>>>>>>>>>>>>>> MATCH IS OVER <<<<<<<<<<<<<<<<<<<<<');
 		produceBattleReport();
 		declareWinner();
 	};
@@ -288,6 +304,7 @@ window.onload = function(){ // Wait for DOM to load
 			// 	return;
 			// }
 			console.log(' >>>>>>>>>>>>>>>>>>>>> Battle ' + (k + 1) + ' <<<<<<<<<<<<<<<<<<<<<');
+			log(' >>>>>>>>>>>>>>>>>>>>> Battle ' + (k + 1) + ' <<<<<<<<<<<<<<<<<<<<<');
 
 			defTroopForThisRound = findWeakestTroop(defArmyInnerTemp); 
 			attTroopForThisRound = findWeakestTroop(attArmyInnerTemp);
@@ -320,6 +337,12 @@ window.onload = function(){ // Wait for DOM to load
 		console.log('Defender troop lost: ' + defLoses);	
 		console.log('Attacker troop lost: ' + attLoses);
 
+		log('Attaking troop for this battle is: ' + minAtt + ' ' + attTroopForThisRound.tier + ' ' + attTroopForThisRound.troop);
+		log('Defending troop for this round is: ' + defTroopForThisRound.quantity + ' ' + defTroopForThisRound.tier + ' ' + defTroopForThisRound.troop);
+		log('battle result:');
+		log('Defender troop lost: ' + defLoses);	
+		log('Attacker troop lost: ' + attLoses);
+
 		defArmyForNextRoundOrAttTypeChange[defTroopForThisRound.troop][defTroopForThisRound.tier] = defTroopForThisRound.quantity - defLoses;
 		defArmyForNextBattle[defTroopForThisRound.troop][defTroopForThisRound.tier] = 0;
 
@@ -333,7 +356,12 @@ window.onload = function(){ // Wait for DOM to load
 
 		battleLog[battleCount-1] = {'attTroop': attTroopForThisRound, 'attTroopLosses' : attLoses, 'defTroop': defTroopForThisRound, 'defTroopLosses': defLoses};
 		attTroppsLost[attTroopForThisRound.tier] += attLoses;
+
+		attArmyLosses[attTroopForThisRound.troop][attTroopForThisRound.tier] += attLoses;
+
 		defTroopsLost[defTroopForThisRound.tier] += defLoses;
+
+		defArmykills[defTroopForThisRound.troop][defTroopForThisRound.tier] += defLoses;
 
 		battleCount++;
 
@@ -564,7 +592,24 @@ window.onload = function(){ // Wait for DOM to load
 		var might = 0;
 
 		for(i=0; i<tiers.length; i++){
-			might += troopLost[tiers[i]] * avgMight[tiers[i]]; //mightCoef[troopLost.troop][tiers[i]]
+			might += troopLost[tiers[i]] * mightCoef[troopLost.troop][tiers[i]];// ----- avgMight[tiers[i]]
+		}
+
+		return might;
+	};
+
+	function calcTotalMightloss(troopLost){
+		
+		var i = 0;
+		var might = 0;
+
+		for(i = 0; i < troopsTypes.length; i++){
+
+			might += (troopLost[troopsTypes[i]].t1 * mightCoef[troopsTypes[i]].t1) + 
+						(troopLost[troopsTypes[i]].t2 * mightCoef[troopsTypes[i]].t2) +
+						(troopLost[troopsTypes[i]].t3 * mightCoef[troopsTypes[i]].t3) +
+						(troopLost[troopsTypes[i]].t4 * mightCoef[troopsTypes[i]].t4) +
+						(troopLost[troopsTypes[i]].t5 * mightCoef[troopsTypes[i]].t5);
 		}
 
 		return might;
@@ -579,25 +624,41 @@ window.onload = function(){ // Wait for DOM to load
 
 	function declareWinner(){
 
-		var attMightLost = calcMight(attTroppsLost);
-		var defMightLost = calcMight(defTroopsLost);
+		//var attMightLost = calcMight(attTroppsLost);
+		//var defMightLost = calcMight(defTroopsLost);
+		var attMightLost = calcTotalMightloss(attArmyLosses);
+		var defMightLost = calcTotalMightloss(defArmykills);
+
 		var attWL = 0;
 		var defWL = 0;
 
 		if(defMightLost > attMightLost){
 			console.log('Attacker won the battle! ');
+			log('Attacker won the battle! ');
 
 		}
 		if(defMightLost === attMightLost){
 			console.log('Its a tie');
+			log('Its a tie');
 
 		}
 		if(defMightLost < attMightLost){
 			console.log('Defender won the battle! ');
+			log('Defender won the battle! ');
 		}
 		console.log('Attacker might lost =  ' + attMightLost);
 		console.log('Defender might lost =  ' + defMightLost);
 
+		log('Attacker might lost =  ' + attMightLost);
+		log('Attacker lost tier 1: ' + attTroppsLost['t1']);
+		log('Attacker lost tier 2: ' + attTroppsLost['t2']);
+		log('Attacker lost tier 3: ' + attTroppsLost['t3']);
+		log('Attacker lost tier 4: ' + attTroppsLost['t4']);
+		log('Defender might lost =  ' + defMightLost);
+		log('Attacker lost tier 1: ' + defTroopsLost['t1']);
+		log('Attacker lost tier 2: ' + defTroopsLost['t2']);
+		log('Attacker lost tier 3: ' + defTroopsLost['t3']);
+		log('Attacker lost tier 4: ' + defTroopsLost['t4']);
 	};
 
 	function makeJSON(){
